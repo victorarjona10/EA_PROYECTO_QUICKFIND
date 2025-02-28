@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { ICompany } from '../models/company';
 import { CompanyService } from '../services/company.service';
+import { ProductModel } from '../models/product';
+
 
 const companyService = new CompanyService();
 
@@ -51,5 +53,18 @@ export async function deleteCompanyById(req: Request, res: Response): Promise<vo
         res.status(200).json(deletedCompany);
     } catch (error) {
         res.status(400).json({ message: "Error deleting company", error });
+    }
+}
+
+export async function getCompanyWithProductsById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        const company = await companyService.getCompanyWithProductsById(id);
+        if (!company) {
+            throw new Error('Company not found');
+        }
+        res.status(200).json(company);
+    } catch (error) {
+        res.status(400).json({ message: "Error getting company with products", error });
     }
 }

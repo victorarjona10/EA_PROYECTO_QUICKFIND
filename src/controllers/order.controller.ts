@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IPedido } from '../models/pedidos';
-import { PedidosService } from '../services/pedidos.service';
+import { IOrder } from '../models/order';
+import { PedidosService } from '../services/order.service';
 
 const pedidosService = new PedidosService();
 
@@ -28,7 +28,7 @@ const pedidosService = new PedidosService();
  */
 export async function postPedido(req: Request, res: Response): Promise<void> {
     try {
-        const pedido = req.body as IPedido;
+        const pedido = req.body as IOrder;
         const newPedido = await pedidosService.postPedido(pedido);
         res.status(201).json(newPedido);
     } catch (error) {
@@ -138,7 +138,7 @@ export async function getPedidoById(req: Request, res: Response): Promise<void> 
 export async function updatePedidoById(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
-        const pedido = req.body as IPedido;
+        const pedido = req.body as IOrder;
         const updatedPedido = await pedidosService.updatePedidoById(id, pedido);
         res.status(200).json(updatedPedido);
     } catch (error) {

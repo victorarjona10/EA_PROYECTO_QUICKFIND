@@ -1,6 +1,6 @@
 import { connect, connection } from 'mongoose'
 
-const mongoURI = 'mongodb://localhost:27017/';  
+const mongoURI = 'mongodb://localhost:27017/proyecto';  
 
 export async function startConnection() {
     try {

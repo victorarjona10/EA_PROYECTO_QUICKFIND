@@ -1,4 +1,4 @@
-import { IProduct, ProductModel } from '../models/Products';
+import { IProduct, ProductModel } from '../models/product';
 
 export class ProductService {
     async postProduct(product: Partial<IProduct>): Promise<IProduct> {

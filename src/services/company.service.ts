@@ -21,4 +21,8 @@ export class CompanyService {
     async deleteCompanyById(id: string): Promise<ICompany | null> {
         return CompanyModel.findByIdAndDelete(id);
     }
+
+    async getCompanyWithProductsById(id: string): Promise<ICompany | null> {
+        return CompanyModel.findById(id).populate('products').exec();
+    }
 }

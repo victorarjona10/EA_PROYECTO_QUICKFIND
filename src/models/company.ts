@@ -1,5 +1,6 @@
 import {ObjectId, Schema, model} from 'mongoose';
 
+
 export interface ICompany {
   _id: ObjectId;
   name: string;
@@ -10,7 +11,7 @@ export interface ICompany {
   phone: string;
   password: string;
   wallet: number;
-  //lista de productos
+  products: ObjectId[];
 }
 
 
@@ -22,7 +23,8 @@ const companySchema = new Schema<ICompany>({
     email: { type: String, required: true },
     phone: { type: String, required: true },
     password: { type: String, required: true },
-    wallet: { type: Number, required: true }
+    wallet: { type: Number, required: true },
+    products: [{ type: Schema.Types.ObjectId, ref: "Product" , required: true}],
   });
   
   export const CompanyModel = model("Company", companySchema);

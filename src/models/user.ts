@@ -15,7 +15,7 @@ const userSchema = new Schema<IUser>({
   email: {type: String, required: true},
   password: {type: String, required: true},
   phone: {type: String, required: true},
-  wallet: {type: Number, required: true}
+  wallet: {type: Number, required: false, default: 0}
   //reservas--productos
 });
 

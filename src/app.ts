@@ -2,9 +2,9 @@ import express, { RequestHandler } from 'express';
 import { startConnection } from './database';
 import { setupSwagger } from './swagger'; 
 import userRoutes from './routes/user.routes'; 
-import productsRoutes from './routes/products.routes';
+import productsRoutes from './routes/product.routes';
 import companyRoutes from './routes/company.routes';
-import pedidosRoutes from './routes/pedidos.routes';
+import pedidosRoutes from './routes/order.routes';
 
 const app: express.Application = express();
 
