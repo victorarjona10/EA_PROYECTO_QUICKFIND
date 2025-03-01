@@ -12,8 +12,16 @@ export class UserService {
         return await UserModel.find();
     }
 
+    async getUserByName(name: string): Promise<IUser | null> {
+        return await UserModel.findOne({ name });
+    }
+
     async getUserById(id: string): Promise<IUser | null>{
         return await UserModel.findById(id);
+    }
+
+    async getUserByEmail(email: string): Promise<IUser | null> {
+        return await UserModel.findOne({ email });
     }
 
     async updateUserById(id: string, user: Partial<IUser>): Promise<IUser | null> {
@@ -23,6 +31,7 @@ export class UserService {
     async deleteUserById(id: string): Promise<IUser | null> {
         return await UserModel.findByIdAndDelete(id);
     }
+
     
     /*async AddSubjectToUser(user: Partial<IUser>, subjectId: Object[]): Promise<IUser | null> {
         if (!user.subjects) {

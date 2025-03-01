@@ -106,6 +106,72 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
 
 /**
  * @swagger
+ * /api/users/name/{name}:
+ *   get:
+ *     summary: Get a user by name
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user name
+ *     responses:
+ *       200:
+ *         description: The user description by name
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Error getting user
+ */
+export async function getUserByName(req: Request, res: Response): Promise<void> {
+    try {
+        const name = req.params.name;
+        const user = await userService.getUserByName(name);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ message: "Error getting user", error });
+    }
+}
+
+/**
+ * @swagger
+ * /api/users/email/{email}:
+ *   get:
+ *     summary: Get a user by email
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user email
+ *     responses:
+ *       200:
+ *         description: The user description by email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Error getting user
+ */
+export async function getUserByEmail(req: Request, res: Response): Promise<void> {
+    try {
+        const email = req.params.email;
+        const user = await userService.getUserByEmail(email);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ message: "Error getting user", error });
+    }
+}
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   put:
  *     summary: Update a user by ID

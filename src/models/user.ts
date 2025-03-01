@@ -11,10 +11,10 @@ export interface IUser {
 }
 
 const userSchema = new Schema<IUser>({
-  name: {type: String, required: true},
+  name: {type: String, required: false},
   email: {type: String, required: true},
   password: {type: String, required: true},
-  phone: {type: String, required: true},
+  phone: {type: String, required: false},
   wallet: {type: Number, required: false, default: 0}
   //reservas--productos
 });
