@@ -7,7 +7,7 @@ export interface IOrder {
   products: {
     product_id: ObjectId;
     quantity: number;
-    unit_price: number;
+    //unit_price: number;
   }[];
   orderDate: Date;
   status: string;
@@ -20,7 +20,7 @@ const orderSchema = new Schema<IOrder>({
     {
       product_id: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
       quantity: { type: Number, required: true },
-      unit_price: { type: Number, required: true }
+      //unit_price: { type: Number, required: true }
     }
   ],
   orderDate: { type: Date, default: Date.now },
