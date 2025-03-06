@@ -7,6 +7,7 @@ export interface IUser {
   password: string;
   phone: string;
   wallet: number;
+  Flag: boolean;
   //reservas--productos 
 }
 
@@ -15,7 +16,8 @@ const userSchema = new Schema<IUser>({
   email: {type: String, required: true},
   password: {type: String, required: true},
   phone: {type: String, required: false},
-  wallet: {type: Number, required: false, default: 0}
+  wallet: {type: Number, required: false, default: 0},
+  Flag: {type: Boolean, required: false, default: true}
   //reservas--productos
 });
 

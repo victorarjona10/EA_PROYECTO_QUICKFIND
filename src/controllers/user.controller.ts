@@ -233,39 +233,31 @@ export async function updateUserById(req: Request, res: Response): Promise<void>
  *       400:
  *         description: Error deleting user
  */
-export async function deleteUserById(req: Request, res: Response): Promise<void> {
+export async function InactivateUserById(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
-        const deletedUser = await userService.deleteUserById(id);
-        res.status(200).json(deletedUser);
+        const desactivatedUser = await userService.InactivateUserById(id);
+        res.status(200).json(desactivatedUser);
     } catch (error) {
         res.status(400).json({ message: "Error deleting user", error });
     }
 } 
 
-
-//  add subject to a user
-/*export async function addSubjectToUser(req: Request, res: Response): Promise<void> {
+export async function ativateUserById(req: Request, res: Response): Promise<void> {
     try {
-        const { userId, subjectId } = req.body;
-        const user = await userService.getUserById(userId);
-        const subject = await subjectService.getSubjectById(subjectId);
-        if (!user || !subject) {
-            res.status(404).json({ message: "User or Subject not found" });
-            return;
-        }
-        
-        const UserWithSubjectAdded = await userService.AddSubjectToUser(user, subjectId);
+        const id = req.params.id;
+        const activatedUser = await userService.ativateUserById(id);
+        res.status(200).json(activatedUser);
+    } catch (error) {
+        res.status(400).json({ message: "Error deleting user", error });
+    }
+}
 
-        /*
-        user.subjects.push(subjectId);
-        await user.userService.updateUserById(userId, user);
-
-        subject.users.push(userId);
-        await subject.save(); */
-
-       // res.status(200).json({ message: "Subject added to user successfully" });
-   // } catch (error) {
-   //     res.status(400).json({ message: "Error adding subject to user", error });
-   // }
-//} 
+export async function getAllActiveUsers(req: Request, res: Response): Promise<void> {
+    try {
+        const activeUsers = await userService.getAllActiveUsers();
+        res.status(200).json(activeUsers);
+    } catch (error) {
+        res.status(400).json({ message: "Error getting users", error });
+    }
+}

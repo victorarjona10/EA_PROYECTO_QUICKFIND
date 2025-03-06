@@ -28,18 +28,16 @@ export class UserService {
         return await UserModel.findByIdAndUpdate(id, user, {new: true});
     }
 
-    async deleteUserById(id: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndDelete(id);
+    async InactivateUserById(id: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(id, {Flag: false}, {new: true});
     }
 
+    async ativateUserById(id: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(id, {Flag: true}, {new: true});
+    }
+
+    async getAllActiveUsers(): Promise<IUser[]> {
+        return await UserModel.find({Flag: true});
+    }
     
-    /*async AddSubjectToUser(user: Partial<IUser>, subjectId: Object[]): Promise<IUser | null> {
-        if (!user.subjects) {
-            user.subjects = []; // Inicializar el array si no existe
-        }
-        user.subjects.push(subjectId);
-        return await user.save();
-
-    }*/
-
 }
