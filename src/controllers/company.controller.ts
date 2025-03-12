@@ -11,8 +11,14 @@ export async function postCompany(req: Request, res: Response): Promise<void> {
         const company = req.body as ICompany;
         const newCompany = await companyService.postCompany(company);
         res.status(201).json(newCompany);
-    } catch (error) {
-        res.status(400).json({ message: "Error creating company", error });
+    } catch (error: any) {
+        if (error.message === "El email ya está registrado") {
+            // Enviar una respuesta clara para el error de email duplicado
+            res.status(400).json({ message: error.message });
+        } else {
+            // Manejo genérico de errores
+            res.status(500).json({ message: "Error al crear el usuario", error });
+        }
     }
 }
 
@@ -41,8 +47,14 @@ export async function updateCompanyById(req: Request, res: Response): Promise<vo
         const company = req.body as ICompany;
         const updatedCompany = await companyService.updateCompanyById(id, company);
         res.status(200).json(updatedCompany);
-    } catch (error) {
-        res.status(400).json({ message: "Error updating company", error });
+    } catch (error: any) {
+        if (error.message === "El email ya está registrado") {
+            // Enviar una respuesta clara para el error de email duplicado
+            res.status(400).json({ message: error.message });
+        } else {
+            // Manejo genérico de errores
+            res.status(500).json({ message: "Error al actualizar el usuario", error });
+        }
     }
 }
 
