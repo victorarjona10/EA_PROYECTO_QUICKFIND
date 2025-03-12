@@ -9,9 +9,15 @@ export async function postAdmin(req: Request, res: Response): Promise<void> {
     const admin = req.body as IAdmin;
     const newAdmin = await adminService.postAdmin(admin);
     res.status(201).json(newAdmin);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating admin", error });
-  }
+  } catch (error: any) {
+    if (error.message === "El email ya está registrado") {
+        // Enviar una respuesta clara para el error de email duplicado
+        res.status(400).json({ message: error.message });
+    } else {
+        // Manejo genérico de errores
+        res.status(500).json({ message: "Error al crear el usuario", error });
+    }
+}
 }
 
 export async function getAllAdmins(req: Request, res: Response): Promise<void> {
@@ -42,9 +48,15 @@ export async function updateAdminById(
     const admin = req.body as IAdmin;
     const updatedAdmin = await adminService.updateAdminById(id, admin);
     res.status(200).json(updatedAdmin);
-  } catch (error) {
-    res.status(400).json({ message: "Error updating admin", error });
-  }
+  } catch (error: any) {
+    if (error.message === "El email ya está registrado") {
+        // Enviar una respuesta clara para el error de email duplicado
+        res.status(400).json({ message: error.message });
+    } else {
+        // Manejo genérico de errores
+        res.status(500).json({ message: "Error al actualizar el usuario", error });
+    }
+}
 }
 
 export async function deleteAdminById(
