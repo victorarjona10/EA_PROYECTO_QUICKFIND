@@ -1,14 +1,10 @@
-import { Request, Response } from 'express';
-import { IUser } from '../models/user';
-import { UserService } from '../services/user.service';
+import { Request, Response } from "express";
+import { IUser } from "../models/user";
+import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
-import { ObjectId } from 'mongoose';
-
-
-
+import { ObjectId } from "mongoose";
 
 const userService = new UserService();
-
 
 /**
  * @swagger
@@ -34,13 +30,13 @@ const userService = new UserService();
  */
 
 export async function postUser(req: Request, res: Response): Promise<void> {
-    try {
-        const user = req.body as IUser;
-        const newUser = await userService.postUser(user);
-        res.status(201).json(newUser);
-    } catch (error) {
-        res.status(400).json({ message: "Error creating user", error });
-    }
+  try {
+    const user = req.body as IUser;
+    const newUser = await userService.postUser(user);
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ message: "Error creating user", error });
+  }
 }
 
 /**
@@ -63,12 +59,14 @@ export async function postUser(req: Request, res: Response): Promise<void> {
  */
 
 export async function getAllUsers(req: Request, res: Response): Promise<void> {
-    try {
-        const users = await userService.getallUsers();
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting users", error });
-    }
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 25;
+    const users = await userService.getAllUsers(page, limit);
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting users", error });
+  }
 }
 
 /**
@@ -95,13 +93,13 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
  *         description: Error getting user
  */
 export async function getUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const user = await userService.getUserById(id);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(404).json({ message: "Error getting user", error });
-    }
+  try {
+    const id = req.params.id;
+    const user = await userService.getUserById(id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ message: "Error getting user", error });
+  }
 }
 
 /**
@@ -127,14 +125,17 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
  *       400:
  *         description: Error getting user
  */
-export async function getUserByName(req: Request, res: Response): Promise<void> {
-    try {
-        const name = req.params.name;
-        const user = await userService.getUserByName(name);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting user", error });
-    }
+export async function getUserByName(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const name = req.params.name;
+    const user = await userService.getUserByName(name);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting user", error });
+  }
 }
 
 /**
@@ -160,14 +161,17 @@ export async function getUserByName(req: Request, res: Response): Promise<void> 
  *       400:
  *         description: Error getting user
  */
-export async function getUserByEmail(req: Request, res: Response): Promise<void> {
-    try {
-        const email = req.params.email;
-        const user = await userService.getUserByEmail(email);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting user", error });
-    }
+export async function getUserByEmail(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const email = req.params.email;
+    const user = await userService.getUserByEmail(email);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting user", error });
+  }
 }
 
 /**
@@ -199,15 +203,18 @@ export async function getUserByEmail(req: Request, res: Response): Promise<void>
  *       400:
  *         description: Error updating user
  */
-export async function updateUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const user = req.body as IUser;
-        const updatedUser = await userService.updateUserById(id, user);
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(400).json({ message: "Error updating user", error });
-    }
+export async function updateUserById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const user = req.body as IUser;
+    const updatedUser = await userService.updateUserById(id, user);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ message: "Error updating user", error });
+  }
 }
 
 /**
@@ -233,31 +240,40 @@ export async function updateUserById(req: Request, res: Response): Promise<void>
  *       400:
  *         description: Error deleting user
  */
-export async function InactivateUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const desactivatedUser = await userService.InactivateUserById(id);
-        res.status(200).json(desactivatedUser);
-    } catch (error) {
-        res.status(400).json({ message: "Error deleting user", error });
-    }
-} 
-
-export async function ativateUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const activatedUser = await userService.ativateUserById(id);
-        res.status(200).json(activatedUser);
-    } catch (error) {
-        res.status(400).json({ message: "Error deleting user", error });
-    }
+export async function InactivateUserById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const desactivatedUser = await userService.InactivateUserById(id);
+    res.status(200).json(desactivatedUser);
+  } catch (error) {
+    res.status(400).json({ message: "Error deleting user", error });
+  }
 }
 
-export async function getAllActiveUsers(req: Request, res: Response): Promise<void> {
-    try {
-        const activeUsers = await userService.getAllActiveUsers();
-        res.status(200).json(activeUsers);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting users", error });
-    }
+export async function ativateUserById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const activatedUser = await userService.ativateUserById(id);
+    res.status(200).json(activatedUser);
+  } catch (error) {
+    res.status(400).json({ message: "Error deleting user", error });
+  }
+}
+
+export async function getAllActiveUsers(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const activeUsers = await userService.getAllActiveUsers();
+    res.status(200).json(activeUsers);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting users", error });
+  }
 }
