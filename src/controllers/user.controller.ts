@@ -30,13 +30,19 @@ const userService = new UserService();
  */
 
 export async function postUser(req: Request, res: Response): Promise<void> {
-  try {
-    const user = req.body as IUser;
-    const newUser = await userService.postUser(user);
-    res.status(201).json(newUser);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating user", error });
-  }
+    try {
+        const user = req.body as IUser;
+        const newUser = await userService.postUser(user);
+        res.status(201).json(newUser);
+    } catch (error: any) {
+        if (error.message === "El email ya está registrado") {
+            // Enviar una respuesta clara para el error de email duplicado
+            res.status(400).json({ message: error.message });
+        } else {
+            // Manejo genérico de errores
+            res.status(500).json({ message: "Error al crear el usuario", error });
+        }
+    }
 }
 
 /**
@@ -203,18 +209,21 @@ export async function getUserByEmail(
  *       400:
  *         description: Error updating user
  */
-export async function updateUserById(
-  req: Request,
-  res: Response
-): Promise<void> {
-  try {
-    const id = req.params.id;
-    const user = req.body as IUser;
-    const updatedUser = await userService.updateUserById(id, user);
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    res.status(400).json({ message: "Error updating user", error });
-  }
+export async function updateUserById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        const user = req.body as IUser;
+        const updatedUser = await userService.updateUserById(id, user);
+        res.status(200).json(updatedUser);
+    } catch (error: any) {
+        if (error.message === "El email ya está registrado") {
+            // Enviar una respuesta clara para el error de email duplicado
+            res.status(400).json({ message: error.message });
+        } else {
+            // Manejo genérico de errores
+            res.status(500).json({ message: "Error al actualizar el usuario", error });
+        }
+    }
 }
 
 /**

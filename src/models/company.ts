@@ -20,11 +20,16 @@ const companySchema = new Schema<ICompany>({
     rating: { type: Number, required: true },
     description: { type: String, required: true },
     location: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true, validate: {
+      validator: function(value: string) {
+        return value.includes('@');
+    },
+      message: 'Email must contain @'
+    }}, 
     phone: { type: String, required: true },
     password: { type: String, required: true },
-    wallet: { type: Number, required: true },
-    products: [{ type: Schema.Types.ObjectId, ref: "Product" , required: true}],
+    wallet: { type: Number, required: false, default: 0 },
+    products: [{ type: Schema.Types.ObjectId, ref: "Product" , required: false}],
   });
   
   export const CompanyModel = model("Company", companySchema);
