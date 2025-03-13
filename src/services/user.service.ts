@@ -1,8 +1,27 @@
-import { IUser, UserModel } from '../models/user';
-
-
+import { IUser, UserModel } from "../models/user";
 
 export class UserService {
+
+  async getAllUsers(page: number, limit: number): Promise<IUser[]> {
+    const skip = (page - 1) * limit;
+    return await UserModel.find().skip(skip).limit(limit);
+  }
+
+  async InactivateUserById(id: string): Promise<IUser | null> {
+    return await UserModel.findByIdAndUpdate(
+      id,
+      { Flag: false },
+      { new: true }
+    );
+  }
+
+  async ativateUserById(id: string): Promise<IUser | null> {
+    return await UserModel.findByIdAndUpdate(id, { Flag: true }, { new: true });
+  }
+
+  async getAllActiveUsers(): Promise<IUser[]> {
+    return await UserModel.find({ Flag: true });
+  }
     async postUser(user: Partial<IUser>): Promise<IUser> {
         try {
         const newUser = new UserModel(user);
@@ -15,10 +34,6 @@ export class UserService {
             console.log(error);
             throw error;
         }
-    }
-
-    async getallUsers(): Promise<IUser[]> {
-        return await UserModel.find();
     }
 
     async getUserByName(name: string): Promise<IUser | null> {
@@ -53,18 +68,6 @@ export class UserService {
             console.log(error);
             throw error;
         }
-    }
-
-    async InactivateUserById(id: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(id, {Flag: false}, {new: true});
-    }
-
-    async ativateUserById(id: string): Promise<IUser | null> {
-        return await UserModel.findByIdAndUpdate(id, {Flag: true}, {new: true});
-    }
-
-    async getAllActiveUsers(): Promise<IUser[]> {
-        return await UserModel.find({Flag: true});
     }
     
 }
