@@ -64,11 +64,7 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
  */
 export async function getPedidosByUserId(req: Request, res: Response): Promise<void> {
     try {
-<<<<<<< HEAD
-        const userId = req.params.idUsuario;
-=======
         const userId = req.params.idUser;
->>>>>>> ordersPopulate
         const pedidos = await pedidosService.getPedidosByUserId(userId);
         res.status(200).json(pedidos);
     } catch (error) {
