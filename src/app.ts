@@ -12,6 +12,7 @@ import { routeNotFound } from "./middleware/routeNotFound";
 
 const app = express();
 
+//puerto
 app.set("port", process.env.PORT || 4000);
 app.use(corsHandler); //Middleware para gestionar las peticiones permitidas
 app.use(loggingHandler); //Middleware para registrar las peticiones por consola
