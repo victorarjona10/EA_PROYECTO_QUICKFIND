@@ -8,6 +8,12 @@ export interface IUser {
   phone: string;
   wallet: number;
   Flag: boolean;
+<<<<<<< HEAD
+=======
+  description?: string;
+  avatar?: string;
+
+>>>>>>> ordersPopulate
   //reservas--productos 
 }
 
@@ -22,7 +28,13 @@ const userSchema = new Schema<IUser>({
   password: {type: String, required: true},
   phone: {type: String, required: false},
   wallet: {type: Number, required: false, default: 0},
+<<<<<<< HEAD
   Flag: {type: Boolean, required: false, default: true}
+=======
+  Flag: {type: Boolean, required: false, default: true},
+  description: {type: String, required: false},
+  avatar: {type: String, required: false}
+>>>>>>> ordersPopulate
   //reservas--productos
 });
 
