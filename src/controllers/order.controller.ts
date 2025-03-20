@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { IOrder } from '../models/order';
-import { PedidosService } from '../services/order.service';
+import { Request, Response } from "express";
+import { IOrder } from "../models/order";
+import { PedidosService } from "../services/order.service";
 
 const pedidosService = new PedidosService();
 
@@ -27,15 +27,14 @@ const pedidosService = new PedidosService();
  *         description: Error creating order
  */
 export async function postPedido(req: Request, res: Response): Promise<void> {
-    try {
-        const pedido = req.body as IOrder;
-        const newPedido = await pedidosService.postPedido(pedido);
-        res.status(201).json(newPedido);
-    } catch (error) {
-        res.status(400).json({ message: "Error creating order", error });
-    }
+  try {
+    const pedido = req.body as IOrder;
+    const newPedido = await pedidosService.postPedido(pedido);
+    res.status(201).json(newPedido);
+  } catch (error) {
+    res.status(400).json({ message: "Error creating order", error });
+  }
 }
-
 
 /**
  * @swagger
@@ -62,16 +61,18 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
  *       400:
  *         description: Error getting orders
  */
-export async function getPedidosByUserId(req: Request, res: Response): Promise<void> {
-    try {
-        const userId = req.params.idUser;
-        const pedidos = await pedidosService.getPedidosByUserId(userId);
-        res.status(200).json(pedidos);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting orders", error });
-    }
+export async function getPedidosByUserId(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const userId = req.params.idUser;
+    const pedidos = await pedidosService.getPedidosByUserId(userId);
+    res.status(200).json(pedidos);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting orders", error });
+  }
 }
-
 
 /**
  * @swagger
@@ -96,14 +97,17 @@ export async function getPedidosByUserId(req: Request, res: Response): Promise<v
  *       400:
  *         description: Error getting order
  */
-export async function getPedidoById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const pedido = await pedidosService.getPedidoById(id);
-        res.status(200).json(pedido);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting order", error });
-    }
+export async function getPedidoById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const pedido = await pedidosService.getPedidoById(id);
+    res.status(200).json(pedido);
+  } catch (error) {
+    res.status(400).json({ message: "Error getting order", error });
+  }
 }
 
 /**
@@ -135,15 +139,18 @@ export async function getPedidoById(req: Request, res: Response): Promise<void> 
  *       400:
  *         description: Error updating order
  */
-export async function updatePedidoById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const pedido = req.body as IOrder;
-        const updatedPedido = await pedidosService.updatePedidoById(id, pedido);
-        res.status(200).json(updatedPedido);
-    } catch (error) {
-        res.status(400).json({ message: "Error updating order", error });
-    }
+export async function updatePedidoById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const pedido = req.body as IOrder;
+    const updatedPedido = await pedidosService.updatePedidoById(id, pedido);
+    res.status(200).json(updatedPedido);
+  } catch (error) {
+    res.status(400).json({ message: "Error updating order", error });
+  }
 }
 
 /**
@@ -169,17 +176,15 @@ export async function updatePedidoById(req: Request, res: Response): Promise<voi
  *       400:
  *         description: Error deleting order
  */
-export async function deletePedidoById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const deletedPedido = await pedidosService.deletePedidoById(id);
-        res.status(200).json(deletedPedido);
-    } catch (error) {
-        res.status(400).json({ message: "Error deleting order", error });
-    }
+export async function deletePedidoById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const deletedPedido = await pedidosService.deletePedidoById(id);
+    res.status(200).json(deletedPedido);
+  } catch (error) {
+    res.status(400).json({ message: "Error deleting order", error });
+  }
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> ordersPopulate
