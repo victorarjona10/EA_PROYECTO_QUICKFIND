@@ -8,18 +8,18 @@ export class PedidosService {
     }
 
     async getPedidosByUserId(userId: string) {
-        return await OrderModel.find({ user_id: userId }).populate('usuario_id').populate('productos.producto_id').exec();
+        return await OrderModel.find({ user_id: userId }).populate('user_id').populate('products.product_id').exec();
     }
 
     async getPedidoById(id: string) {
-        return await OrderModel.findById(id).populate('usuario_id').populate('productos.producto_id').exec();
+        return await OrderModel.findById(id).populate('user_id').populate('products.product_id').exec();
     }
 
     async updatePedidoById(id: string, pedido: IOrder) {
-        return await OrderModel.findByIdAndUpdate(id, pedido, { new: true }).populate('usuario_id').populate('productos.producto_id').exec();
+        return await OrderModel.findByIdAndUpdate(id, pedido, { new: true }).populate('user_id').populate('products.product_id').exec();
     }
 
     async deletePedidoById(id: string) {
-        return await OrderModel.findByIdAndDelete(id).populate('usuario_id').populate('productos.producto_id').exec();
+        return await OrderModel.findByIdAndDelete(id).populate('user_id').populate('products.product_id').exec();
     }
 }
