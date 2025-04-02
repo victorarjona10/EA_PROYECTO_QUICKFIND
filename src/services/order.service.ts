@@ -59,4 +59,22 @@ export class PedidosService {
     async deletePedidoById(id: string) {
         return await OrderModel.findByIdAndDelete(id).populate('user_id').populate('products.product_id').exec();
     }
+
+    async deleteProductFromOrder(orderId: string, productId: string): Promise<any> {
+        try {
+            const result = await OrderModel.updateOne(
+                { _id: orderId }, // Filtro para encontrar el pedido
+                { $pull: { products: { product_id: productId } } } // Elimina el producto con el product_id especificado
+            );
+
+            if (result.modifiedCount === 0) {
+                throw new Error("No se encontró el producto o el pedido");
+            }
+
+            return { message: `Product deleted from order with id: ${orderId}` };
+        } catch (error: any) {
+            console.log(error);
+            throw error;
+        }
+    }
 }
