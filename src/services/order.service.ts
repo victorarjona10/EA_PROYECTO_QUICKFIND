@@ -59,4 +59,6 @@ export class PedidosService {
     async deletePedidoById(id: string) {
         return await OrderModel.findByIdAndDelete(id).populate('user_id').populate('products.product_id').exec();
     }
+
+   
 }
