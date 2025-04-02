@@ -5,6 +5,7 @@ import {
   getAdminById,
   updateAdminById,
   deleteAdminById,
+  loginAdmin,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -14,5 +15,5 @@ router.get("/", getAllAdmins);
 router.get("/:id", getAdminById);
 router.put("/:id", updateAdminById);
 router.delete("/:id", deleteAdminById);
-
+router.post("/login", loginAdmin);
 export default router;

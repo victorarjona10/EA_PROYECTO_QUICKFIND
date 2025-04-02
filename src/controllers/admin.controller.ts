@@ -11,13 +11,13 @@ export async function postAdmin(req: Request, res: Response): Promise<void> {
     res.status(201).json(newAdmin);
   } catch (error: any) {
     if (error.message === "El email ya está registrado") {
-        // Enviar una respuesta clara para el error de email duplicado
-        res.status(400).json({ message: error.message });
+      // Enviar una respuesta clara para el error de email duplicado
+      res.status(400).json({ message: error.message });
     } else {
-        // Manejo genérico de errores
-        res.status(500).json({ message: "Error al crear el usuario", error });
+      // Manejo genérico de errores
+      res.status(500).json({ message: "Error al crear el usuario", error });
     }
-}
+  }
 }
 
 export async function getAllAdmins(req: Request, res: Response): Promise<void> {
@@ -50,13 +50,15 @@ export async function updateAdminById(
     res.status(200).json(updatedAdmin);
   } catch (error: any) {
     if (error.message === "El email ya está registrado") {
-        // Enviar una respuesta clara para el error de email duplicado
-        res.status(400).json({ message: error.message });
+      // Enviar una respuesta clara para el error de email duplicado
+      res.status(400).json({ message: error.message });
     } else {
-        // Manejo genérico de errores
-        res.status(500).json({ message: "Error al actualizar el usuario", error });
+      // Manejo genérico de errores
+      res
+        .status(500)
+        .json({ message: "Error al actualizar el usuario", error });
     }
-}
+  }
 }
 
 export async function deleteAdminById(
@@ -69,5 +71,15 @@ export async function deleteAdminById(
     res.status(200).json(deletedAdmin);
   } catch (error) {
     res.status(400).json({ message: "Error deleting admin", error });
+  }
+}
+
+export async function loginAdmin(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password } = req.body;
+    const admin = await adminService.loginAdmin(email, password);
+    res.status(200).json({ message: "Login exitoso", admin });
+  } catch (error: any) {
+    res.status(401).json({ message: error.message });
   }
 }
