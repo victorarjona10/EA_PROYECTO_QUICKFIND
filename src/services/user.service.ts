@@ -1,4 +1,5 @@
 import { IUser, UserModel } from "../models/user";
+import mongoose from "mongoose";
 
 export class UserService {
 
@@ -72,4 +73,21 @@ export class UserService {
 
     
     
+    async getUsersByFiltration(user : Partial<IUser>, page: number, limit: number): Promise<IUser[]> {
+        const skip = (page - 1) * limit;
+        
+        // Eliminar campos nulos o indefinidos del objeto users
+        const filter: Partial<IUser> = Object.fromEntries(
+        Object.entries(user).filter(([_, value]) => value != null)
+        );
+
+        // Convertir los valores de los campos en expresiones regulares para búsqueda parcial
+        const regexFilter: Partial<IUser> = Object.fromEntries(
+        Object.entries(filter).map(([key, value]) => [key, { $regex: new RegExp(value as string, "i") }])
+        );
+
+
+        return await UserModel.find(regexFilter).skip(skip).limit(limit);
+    }
+
 }

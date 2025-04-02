@@ -1,3 +1,4 @@
+import { UserModel } from './../models/user';
 import { Request, Response } from "express";
 import { IUser } from "../models/user";
 import { UserService } from "../services/user.service";
@@ -284,5 +285,17 @@ export async function getAllActiveUsers(
     res.status(200).json(activeUsers);
   } catch (error) {
     res.status(400).json({ message: "Error getting users", error });
+  }
+}
+
+export async function getUsersByFiltration(req: Request, res: Response): Promise<void> {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 25;
+    const user = req.body as IUser;
+    const updatedUser = await userService.getUsersByFiltration(user, page, limit);
+    res.status(200).json(updatedUser);
+  }
+  catch (error: any) {
   }
 }
