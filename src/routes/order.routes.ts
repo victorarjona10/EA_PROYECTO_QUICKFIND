@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/", postPedido);   
 router.get('/:id', getPedidoById);
-router.put('/:idUser', updatePedidoById);
+router.put('/:id', updatePedidoById);
 router.delete('/:idUser/:idPedido', deletePedidoById);
 router.get("/AllOrdersByUser/:idUser", getPedidosByUserId);
 
