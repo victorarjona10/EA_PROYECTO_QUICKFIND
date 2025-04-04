@@ -78,6 +78,7 @@ export async function loginAdmin(req: Request, res: Response): Promise<void> {
   try {
     const { email, password } = req.body;
     const admin = await adminService.loginAdmin(email, password);
+  
     res.status(200).json({ message: "Login exitoso", admin });
   } catch (error: any) {
     res.status(401).json({ message: error.message });

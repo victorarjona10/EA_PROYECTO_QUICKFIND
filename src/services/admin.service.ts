@@ -1,5 +1,7 @@
 import { IAdmin, AdminModel } from "../models/admin";
 import { Request, Response } from "express";
+import { verified } from "../utils/bcrypt.handle";
+import { generateToken } from "../utils/jwt.handle";
 
 export class AdminService {
   async postAdmin(admin: Partial<IAdmin>): Promise<IAdmin> {
@@ -48,17 +50,26 @@ export class AdminService {
     return AdminModel.findByIdAndDelete(id);
   }
 
-  async loginAdmin(email: string, password: string): Promise<IAdmin | null> {
+  async loginAdmin(email: string, password: string): Promise<{ token: string; user: IAdmin }> {
     const admin = await AdminModel.findOne({ email });
     if (!admin) {
       throw new Error("Email o contraseña incorrectos");
     }
 
-    // Comparación directa de contraseñas
-    if (admin.password !== password) {
-      throw new Error("Email o contraseña incorrectos");
-    }
+    const isPasswordValid = await verified(password, admin.password); // Compara el hash de la contraseña almacenada con la contraseña proporcionada
+    //Esto solo funciona si la contraseña se ha almacenado como un hash en la base de datos.
 
-    return admin;
+    // if (!isPasswordValid) {
+    //   throw new Error("Email o contraseña incorrectos");
+    // }
+
+    const token = generateToken(admin.id, admin.email);
+
+    const data = {
+        token, 
+        user: admin
+    }
+    return { token, user: admin.toObject() as IAdmin };
+
   }
 }

@@ -290,12 +290,13 @@ export async function getAllActiveUsers(
 
 export async function getUsersByFiltration(req: Request, res: Response): Promise<void> {
   try {
+    const filters = req.query; // Obtener filtros desde los query parameters
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 25;
-    const user = req.body as IUser;
-    const updatedUser = await userService.getUsersByFiltration(user, page, limit);
-    res.status(200).json(updatedUser);
-  }
-  catch (error: any) {
-  }
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const users = await userService.getUsersByFiltration(filters, page, limit);
+    res.status(200).json(users);
+} catch (error) {
+    res.status(400).json({ message: "Error getting users by filtration", error });
+}
 }
