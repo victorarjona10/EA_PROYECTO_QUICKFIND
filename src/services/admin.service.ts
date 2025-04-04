@@ -2,11 +2,16 @@ import { IAdmin, AdminModel } from "../models/admin";
 import { Request, Response } from "express";
 import { verified } from "../utils/bcrypt.handle";
 import { generateToken } from "../utils/jwt.handle";
-
+import {encrypt} from "../utils/bcrypt.handle";
 export class AdminService {
   async postAdmin(admin: Partial<IAdmin>): Promise<IAdmin> {
     try {
+      if (!admin.password) {
+        throw new Error("Password is required");
+      }
+      admin.password = await encrypt(admin.password); // Asegúrate de que admin.password no sea undefined
       const newAdmin = new AdminModel(admin);
+
       return newAdmin.save();
     } catch (error: any) {
       if (error.code === 11000) {
@@ -59,9 +64,9 @@ export class AdminService {
     const isPasswordValid = await verified(password, admin.password); // Compara el hash de la contraseña almacenada con la contraseña proporcionada
     //Esto solo funciona si la contraseña se ha almacenado como un hash en la base de datos.
 
-    // if (!isPasswordValid) {
-    //   throw new Error("Email o contraseña incorrectos");
-    // }
+    if (!isPasswordValid) {
+      throw new Error("Email o contraseña incorrectos");
+    }
 
     const token = generateToken(admin.id, admin.email);
 
