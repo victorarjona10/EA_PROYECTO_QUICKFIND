@@ -4,6 +4,7 @@ import { IUser } from "../models/user";
 import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
 import { ObjectId } from "mongoose";
+import { RequestExt } from "../middleware/session";
 
 const userService = new UserService();
 
@@ -277,7 +278,7 @@ export async function ativateUserById(
 }
 
 export async function getAllActiveUsers(
-  req: Request,
+  req: RequestExt,
   res: Response
 ): Promise<void> {
   try {

@@ -188,6 +188,7 @@ export async function deletePedidoById(
 ): Promise<void> {
   try {
     const id = req.params.id;
+    console.log("Deleting order with ID:", req.params);
     const deletedPedido = await pedidosService.deletePedidoById(id);
     res.status(200).json(deletedPedido);
   } catch (error) {
