@@ -20,7 +20,7 @@ export class AdminService {
       console.log(error);
       throw error;
     }
-  }
+  } 
 
   async getAllAdmins(): Promise<IAdmin[]> {
     return AdminModel.find();

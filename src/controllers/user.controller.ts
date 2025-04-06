@@ -34,7 +34,7 @@ const userService = new UserService();
 export async function postUser(req: Request, res: Response): Promise<void> {
     try {
         const user = req.body as IUser;
-        const newUser = await userService.postUser(user);
+        const newUser = await userService.postUser(user); 
         res.status(201).json(newUser);
     } catch (error: any) {
         if (error.message === "El email ya está registrado") {
@@ -104,6 +104,10 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
     const user = await userService.getUserById(id);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
     res.status(200).json(user);
   } catch (error) {
     res.status(404).json({ message: "Error getting user", error });

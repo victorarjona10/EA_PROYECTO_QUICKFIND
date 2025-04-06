@@ -1,5 +1,8 @@
 import { IUser, UserModel } from "../models/user";
 import mongoose from "mongoose";
+import { verified } from "../utils/bcrypt.handle";
+import { generateToken } from "../utils/jwt.handle";
+import {encrypt} from "../utils/bcrypt.handle";
 
 export class UserService {
 
@@ -25,6 +28,10 @@ export class UserService {
   }
     async postUser(user: Partial<IUser>): Promise<IUser> {
         try {
+            if (!user.password) {
+                throw new Error("Password is required");
+            }
+        user.password = await encrypt(user.password); // Asegúrate de que user.password no sea undefined
         const newUser = new UserModel(user);
         return await newUser.save();
         }
