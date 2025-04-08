@@ -298,4 +298,18 @@ export async function getUsersByFiltration(req: Request, res: Response): Promise
 } catch (error) {
     res.status(400).json({ message: "Error getting users by filtration", error });
 }
+
 }
+
+export async function loginUser(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password } = req.body;
+    const user = await userService.loginUser(email, password);
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(401).json({ message: error.message });
+  }
+}
+
+
+

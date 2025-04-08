@@ -90,4 +90,19 @@ export class UserService {
         return await UserModel.find(regexFilter).skip(skip).limit(limit);
     }
 
+
+  async loginUser(email: string, password: string): Promise<IUser | null> {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw new Error("Email o contraseña incorrectos");
+    }
+
+    // Comparación directa de contraseñas
+    if (user.password !== password) {
+      throw new Error("Email o contraseña incorrectos");
+    }
+
+    return user;
+  }
+
 }

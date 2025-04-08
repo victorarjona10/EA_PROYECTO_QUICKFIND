@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 const router = Router();
 
-import { postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration  } from '../controllers/user.controller'
+import { postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser  } from '../controllers/user.controller'
 
 router.get( "/ActiveUsers/", getAllActiveUsers);
 router.get( "/usersByFiltration/", getUsersByFiltration);
@@ -14,5 +14,7 @@ router.get('/email/:email', getUserByEmail);
 router.put('/:id', updateUserById);
 router.put('/InactivateFlag/:id', InactivateUserById);
 router.put('/ActivateFlag/:id', ativateUserById);
+router.post("/login", loginUser);
+
 
 export default router;
