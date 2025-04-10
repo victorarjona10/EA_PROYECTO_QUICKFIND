@@ -32,10 +32,18 @@ const productService = new ProductService();
 export async function postProduct(req: Request, res: Response): Promise<void> {
     try {
         const product = req.body as IProduct;
+        if (!product.name || !product.price || !product.description) {
+            res.status(400).json({ message: "Nombre, precio y descripción son obligatorios" });
+        }
+
         const newProduct = await productService.postProduct(product);
         res.status(201).json(newProduct);
-    } catch (error) {
-        res.status(400).json({ message: "Error creating product", error });
+    } catch (error:any) {
+        if (error.code === 11000) {
+            res.status(403).json({ message: "El producto ya existe" });
+        } else {
+            res.status(500).json({ message: "Error al crear el producto", error: error.message });
+        }
     }
 }
 
@@ -95,10 +103,16 @@ export async function getAllProducts(req: Request, res: Response): Promise<void>
 export async function getProductById(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
         const product = await productService.getProductById(id);
+        if (!product) {
+            res.status(404).json({ message: "Producto no encontrado" });
+        }
         res.status(200).json(product);
-    } catch (error) {
-        res.status(400).json({ message: "Error getting product", error });
+    } catch (error: any) {
+        res.status(500).json({ message: "Error getting product", error: error.message });
     }
 }
 
@@ -136,10 +150,17 @@ export async function updateProductById(req: Request, res: Response): Promise<vo
     try {
         const id = req.params.id;
         const product = req.body as IProduct;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+
         const updatedProduct = await productService.updateProductById(id, product);
+        if (!updatedProduct) {
+            res.status(404).json({ message: "Producto no encontrado" });
+        }
         res.status(200).json(updatedProduct);
-    } catch (error) {
-        res.status(400).json({ message: "Error updating product", error });
+    } catch (error: any) {
+        res.status(500).json({ message: "Error updating product", error: error.message });
     }
 }
 
@@ -170,10 +191,16 @@ export async function updateProductById(req: Request, res: Response): Promise<vo
 export async function deleteProductById(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
         const deletedProduct = await productService.deleteProductById(id);
+        if (!deletedProduct) {
+            res.status(404).json({ message: "Producto no encontrado" });
+        }
         res.status(200).json(deletedProduct);
     } catch (error) {
-        res.status(400).json({ message: "Error deleting product", error });
+        res.status(500).json({ message: "Error deleting product", error: (error as any).message });
     }
 }
 

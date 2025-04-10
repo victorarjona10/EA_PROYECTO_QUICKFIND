@@ -34,15 +34,24 @@ const userService = new UserService();
 export async function postUser(req: Request, res: Response): Promise<void> {
     try {
         const user = req.body as IUser;
-        const newUser = await userService.postUser(user); 
+
+        // Validar que los datos requeridos estén presentes
+        if (!user.email || !user.password) {
+            res.status(400).json({ message: "Email y contraseña son obligatorios" });
+        }
+
+        const newUser = await userService.postUser(user);
         res.status(201).json(newUser);
     } catch (error: any) {
-        if (error.message === "El email ya está registrado") {
-            // Enviar una respuesta clara para el error de email duplicado
-            res.status(400).json({ message: error.message });
+        if (error.code === 11000) {
+            // Error de duplicado en MongoDB
+            res.status(403).json({ message: "El email ya está registrado" });
+        } else if (error.name === "ValidationError") {
+            // Error de validación de Mongoose
+            res.status(400).json({ message: "Datos inválidos", details: error.errors });
         } else {
-            // Manejo genérico de errores
-            res.status(500).json({ message: "Error al crear el usuario", error });
+            // Error genérico
+            res.status(500).json({ message: "Error al crear el usuario", error: error.message });
         }
     }
 }
@@ -73,7 +82,7 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
     const users = await userService.getAllUsers(page, limit);
     res.status(200).json(users);
   } catch (error) {
-    res.status(400).json({ message: "Error getting users", error });
+    res.status(500).json({ message: "Error getting users", error });
   }
 }
 
@@ -101,19 +110,24 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
  *         description: Error getting user
  */
 export async function getUserById(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id;
-    const user = await userService.getUserById(id);
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(404).json({ message: "Error getting user", error });
-  }
-}
+    try {
+        const id = req.params.id;
 
+        // Validar que el ID sea válido
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+
+        const user = await userService.getUserById(id);
+        if (!user) {
+            res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el usuario", error: (error as any).message });
+    }
+}
 /**
  * @swagger
  * /api/users/name/{name}:
@@ -144,9 +158,12 @@ export async function getUserByName(
   try {
     const name = req.params.name;
     const user = await userService.getUserByName(name);
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
     res.status(200).json(user);
   } catch (error) {
-    res.status(400).json({ message: "Error getting user", error });
+    res.status(500).json({ message: "Error getting user", error });
   }
 }
 
@@ -179,10 +196,14 @@ export async function getUserByEmail(
 ): Promise<void> {
   try {
     const email = req.params.email;
+
     const user = await userService.getUserByEmail(email);
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
     res.status(200).json(user);
   } catch (error) {
-    res.status(400).json({ message: "Error getting user", error });
+    res.status(500).json({ message: "Error getting user", error });
   }
 }
 
@@ -219,15 +240,28 @@ export async function updateUserById(req: Request, res: Response): Promise<void>
     try {
         const id = req.params.id;
         const user = req.body as IUser;
+
+        // Validar que el ID sea válido
+        if (!id || id.length !== 24) {
+           res.status(400).json({ message: "ID inválido" });
+        }
+
+        // Validar que los datos requeridos estén presentes
+        if (!user.email) {
+           res.status(400).json({ message: "El email es obligatorio" });
+        }
+
         const updatedUser = await userService.updateUserById(id, user);
+        if (!updatedUser) {
+           res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
         res.status(200).json(updatedUser);
     } catch (error: any) {
-        if (error.message === "El email ya está registrado") {
-            // Enviar una respuesta clara para el error de email duplicado
-            res.status(400).json({ message: error.message });
+        if (error.code === 11000) {
+            res.status(403).json({ message: "El email ya está registrado" });
         } else {
-            // Manejo genérico de errores
-            res.status(500).json({ message: "Error al actualizar el usuario", error });
+            res.status(500).json({ message: "Error al actualizar el usuario", error: error.message });
         }
     }
 }
@@ -261,10 +295,17 @@ export async function InactivateUserById(
 ): Promise<void> {
   try {
     const id = req.params.id;
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+    }
+
     const desactivatedUser = await userService.InactivateUserById(id);
+    if (!desactivatedUser) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
     res.status(200).json(desactivatedUser);
   } catch (error) {
-    res.status(400).json({ message: "Error deleting user", error });
+    res.status(500).json({ message: "Error deleting user", error });
   }
 }
 
@@ -275,9 +316,13 @@ export async function ativateUserById(
   try {
     const id = req.params.id;
     const activatedUser = await userService.ativateUserById(id);
+    if (!activatedUser) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+
+    }
     res.status(200).json(activatedUser);
   } catch (error) {
-    res.status(400).json({ message: "Error deleting user", error });
+    res.status(500).json({ message: "Error deleting user", error });
   }
 }
 
@@ -287,9 +332,13 @@ export async function getAllActiveUsers(
 ): Promise<void> {
   try {
     const activeUsers = await userService.getAllActiveUsers();
+    if (!activeUsers) {
+      res.status(404).json({ message: "No hay usuarios activos" });
+
+    }
     res.status(200).json(activeUsers);
   } catch (error) {
-    res.status(400).json({ message: "Error getting users", error });
+    res.status(500).json({ message: "Error getting users", error });
   }
 }
 
@@ -302,6 +351,6 @@ export async function getUsersByFiltration(req: Request, res: Response): Promise
     const users = await userService.getUsersByFiltration(filters, page, limit);
     res.status(200).json(users);
 } catch (error) {
-    res.status(400).json({ message: "Error getting users by filtration", error });
+    res.status(500).json({ message: "Error getting users by filtration", error });
 }
 }

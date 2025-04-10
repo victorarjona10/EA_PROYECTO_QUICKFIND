@@ -29,10 +29,15 @@ const pedidosService = new PedidosService();
 export async function postPedido(req: Request, res: Response): Promise<void> {
   try {
     const pedido = req.body as IOrder;
+    if (!pedido.user_id || !pedido.products || pedido.products.length === 0) {
+      res.status(400).json({ message: "User ID, Product ID and quantity are required" });
+      
+    }
+
     const newPedido = await pedidosService.postPedido(pedido);
     res.status(201).json(newPedido);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating order", error });
+  } catch (error:any) {
+    res.status(500).json({ message: "Error creating order", error: error.message });
   }
 }
 
@@ -70,7 +75,7 @@ export async function getPedidosByUserId(
     const pedidos = await pedidosService.getPedidosByUserId(userId);
     res.status(200).json(pedidos);
   } catch (error) {
-    res.status(400).json({ message: "Error getting orders", error });
+    res.status(500).json({ message: "Error getting orders", error });
   }
 }
 
@@ -103,10 +108,16 @@ export async function getPedidoById(
 ): Promise<void> {
   try {
     const id = req.params.id;
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+  }
     const pedido = await pedidosService.getPedidoById(id);
+    if (!pedido) {
+      res.status(404).json({ message: "Pedido no encontrado" });
+  }
     res.status(200).json(pedido);
   } catch (error) {
-    res.status(400).json({ message: "Error getting order", error });
+    res.status(500).json({ message: "Error getting order", error });
   }
 }
 
@@ -144,10 +155,18 @@ export async function updatePedidoById(
   res: Response
 ): Promise<void> {
   try {
+    const id = req.params.id;
+
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
     const updatedPedido = await pedidosService.updatePedidoById(req.params.id, req.body as IOrder);
+    if (!updatedPedido) {
+      res.status(404).json({ message: "Pedido no encontrado" });
+  }
     res.status(200).json(updatedPedido);
   } catch (error) {
-    res.status(400).json({ message: "Error updating order", error });
+    res.status(500).json({ message: "Error updating order", error });
   }
 }
 // export async function updateCommentById(req: Request, res: Response): Promise<void> {
@@ -188,10 +207,16 @@ export async function deletePedidoById(
 ): Promise<void> {
   try {
     const id = req.params.id;
-    console.log("Deleting order with ID:", req.params);
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+    }
+
     const deletedPedido = await pedidosService.deletePedidoById(id);
+    if (!deletedPedido) {
+      res.status(404).json({ message: "Pedido no encontrado" });
+    }
     res.status(200).json(deletedPedido);
-  } catch (error) {
-    res.status(400).json({ message: "Error deleting order", error });
+  } catch (error:any) {
+    res.status(500).json({ message: "Error deleting order", error: error.message });
   }
 }

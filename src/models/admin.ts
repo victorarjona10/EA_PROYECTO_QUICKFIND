@@ -8,6 +8,8 @@ export interface IAdmin {
   phone: string;
   password2: string;
   Flag: boolean;
+  refreshToken?: string; 
+  refreshTokenExpiry?: Date; 
   //reservas--productos
 }
 
@@ -23,7 +25,10 @@ const AdminSchema = new Schema<IAdmin>({
   phone: { type: String, required: false },
   password2: { type: String, required: true },
   Flag: { type: Boolean, required: false, default: true },
-  //reservas--productos
+  refreshToken: { type: String },
+  refreshTokenExpiry: { type: Date, default: null },
+
+  
 });
 
 export const AdminModel = model("Admin", AdminSchema);
