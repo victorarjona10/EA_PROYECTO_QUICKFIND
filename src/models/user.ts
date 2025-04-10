@@ -10,6 +10,8 @@ export interface IUser {
   Flag: boolean;
   description?: string;
   avatar?: string;
+  refreshToken?: string; 
+  refreshTokenExpiry?: Date; 
 }
 
 const userSchema = new Schema<IUser>({
@@ -25,7 +27,9 @@ const userSchema = new Schema<IUser>({
   wallet: {type: Number, required: false, default: 0},
   Flag: {type: Boolean, required: false, default: true},
   description: {type: String, required: false},
-  avatar: {type: String, required: false}
+  avatar: {type: String, required: false},
+  refreshToken: { type: String },
+  refreshTokenExpiry: { type: Date, default: null },
 
 });
 

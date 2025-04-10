@@ -6,6 +6,7 @@ import {
   updateAdminById,
   deleteAdminById,
   loginAdmin,
+  refreshAccesToken,
 } from "../controllers/admin.controller";
 import { checkJwt } from "../middleware/session";
 
@@ -17,4 +18,5 @@ router.get("/:id", checkJwt, getAdminById);
 router.put("/:id", checkJwt, updateAdminById);
 router.delete("/:id", checkJwt, deleteAdminById);
 router.post("/login", loginAdmin);
+router.post('/auth/refresh', refreshAccesToken);
 export default router;
