@@ -12,6 +12,8 @@ export interface ICompany {
   password: string;
   wallet: number;
   products: ObjectId[];
+  coordenates_lat: number;
+  coordenates_lng: number;
 }
 
 
@@ -30,6 +32,8 @@ const companySchema = new Schema<ICompany>({
     password: { type: String, required: true },
     wallet: { type: Number, required: false, default: 0 },
     products: [{ type: Schema.Types.ObjectId, ref: "Product" , required: false}],
+    coordenates_lat: { type: Number, required: true },
+    coordenates_lng: { type: Number, required: true },
   });
   
   export const CompanyModel = model("Company", companySchema);

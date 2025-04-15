@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Request, Response } from "express";
 import { startConnection } from "./database";
 import { setupSwagger } from "./swagger";
 import userRoutes from "./routes/user.routes";
@@ -9,8 +9,20 @@ import adminRoutes from "./routes/admin.routes";
 import { corsHandler } from "./middleware/corsHandler";
 import { loggingHandler } from "./middleware/loggingHandler";
 import { routeNotFound } from "./middleware/routeNotFound";
+import { Result } from "express-validator";
+import axios from "axios";
 
+
+// Removed duplicate import of express
 const app = express();
+// Removed duplicate import of axios
+const PORT = 3000;
+
+
+// Inicia el servidor
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
 
 app.set("port", process.env.PORT || 4000);
 app.use(corsHandler); //Middleware para gestionar las peticiones permitidas
