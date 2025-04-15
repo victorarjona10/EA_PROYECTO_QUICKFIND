@@ -4,6 +4,7 @@ import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
 import { ObjectId } from "mongoose";
 import { RequestExt } from "../middleware/session";
+import { UserModel } from "../models/user";
 
 const userService = new UserService();
 
@@ -366,6 +367,25 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
     res.status(401).json({ message: error.message });
   }
 
+}
+
+export async function refreshAccesToken(req: Request, res: Response): Promise<void> {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      res.status(400).json({ message: "Refresh token es obligatorio" });
+    }
+    const user = await UserModel.findOne({ refreshToken });
+    if (!user) {
+      res.status(403).json({ message: "Refresh token inválido" });
+      return;
+    }
+    const { newAccessToken, newRefreshToken } = await userService.refreshTokenService(refreshToken);
+
+    res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken  });
+  } catch (error) {
+    res.status(500).json({ message: "Error refreshing access token", error });
+  }
 }
 
 
