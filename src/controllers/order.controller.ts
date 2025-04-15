@@ -169,14 +169,6 @@ export async function updatePedidoById(
     res.status(500).json({ message: "Error updating order", error });
   }
 }
-// export async function updateCommentById(req: Request, res: Response): Promise<void> {
-//   try{
-//       const updatedComment = await commentService.updateCommentById(req.params.id,req.body as IComment);
-//       res.status(201).json(updatedComment);
-//   }catch(error: any){
-//       res.status(400).json(error);
-//   }
-// }
 
 /**
  * @swagger
@@ -218,5 +210,17 @@ export async function deletePedidoById(
     res.status(200).json(deletedPedido);
   } catch (error:any) {
     res.status(500).json({ message: "Error deleting order", error: error.message });
+  }
+}
+
+export async function deleteProductFromOrder(
+  req: Request,
+  res: Response
+): Promise<void>  {
+  try{
+    const deleteProduct = await pedidosService.deleteProductFromOrder(req.params.orderId, req.params.productId);
+    res.status(200).json(deleteProduct);
+  } catch (error) {
+    res.status(400).json({ message: "Error updating order", error });
   }
 }

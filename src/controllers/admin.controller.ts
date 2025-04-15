@@ -18,7 +18,9 @@ export async function postAdmin(req: Request, res: Response): Promise<void> {
   } catch (error: any) {
     if (error.message === "El email ya está registrado") {
       // Enviar una respuesta clara para el error de email duplicado
+
       res.status(403).json({ message: error.message });
+
     } else {
       // Manejo genérico de errores
       res.status(500).json({ message: "Error al crear el usuario", error });
@@ -69,7 +71,9 @@ export async function updateAdminById(
   } catch (error: any) {
     if (error.message === "El email ya está registrado") {
       // Enviar una respuesta clara para el error de email duplicado
+
       res.status(403).json({ message: error.message });
+
     } else {
       // Manejo genérico de errores
       res
@@ -135,5 +139,15 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
     res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken  });
   } catch (error) {
     res.status(500).json({ message: "Error refreshing access token", error });
+  }
+}
+
+export async function loginAdmin(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password } = req.body;
+    const admin = await adminService.loginAdmin(email, password);
+    res.status(200).json({ message: "Login exitoso", admin });
+  } catch (error: any) {
+    res.status(401).json({ message: error.message });
   }
 }

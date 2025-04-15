@@ -1,4 +1,3 @@
-import { UserModel } from './../models/user';
 import { Request, Response } from "express";
 import { IUser } from "../models/user";
 import { UserService } from "../services/user.service";
@@ -346,11 +345,28 @@ export async function getUsersByFiltration(req: Request, res: Response): Promise
   try {
     const filters = req.query; // Obtener filtros desde los query parameters
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 20;
+
 
     const users = await userService.getUsersByFiltration(filters, page, limit);
     res.status(200).json(users);
 } catch (error) {
+
     res.status(500).json({ message: "Error getting users by filtration", error });
 }
+
 }
+
+export async function loginUser(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password } = req.body;
+    const user = await userService.loginUser(email, password);
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(401).json({ message: error.message });
+  }
+
+}
+
+
+

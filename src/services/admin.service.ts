@@ -21,7 +21,9 @@ export class AdminService {
       console.log(error);
       throw error;
     }
+
   } 
+
 
   async getAllAdmins(): Promise<IAdmin[]> {
     return AdminModel.find();
@@ -56,11 +58,14 @@ export class AdminService {
     return AdminModel.findByIdAndDelete(id);
   }
 
+
   async loginAdmin(email: string, password: string): Promise<{ token: string; user: IAdmin, refreshToken: string }> {
+
     const admin = await AdminModel.findOne({ email });
     if (!admin) {
       throw new Error("Email o contraseña incorrectos");
     }
+
 
     const isPasswordValid = await verified(password, admin.password); // Compara el hash de la contraseña almacenada con la contraseña proporcionada
     //Esto solo funciona si la contraseña se ha almacenado como un hash en la base de datos.
