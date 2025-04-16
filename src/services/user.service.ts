@@ -148,4 +148,9 @@ export class UserService {
   
       return { newAccessToken, newRefreshToken };
   }
+
+  async updateAvatar( avatar:string, email: string): Promise<IUser | null>{
+    return await UserModel.findOneAndUpdate({email:email}, { avatar: avatar }, { new: true });
+  }
+
 }

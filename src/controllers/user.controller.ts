@@ -115,7 +115,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
 
         // Validar que el ID sea válido
         if (!id || id.length !== 24) {
-            res.status(400).json({ message: "ID inválido" });
+            res.status(400).json({ message: "ID inválido getUserById" });
         }
 
         const user = await userService.getUserById(id);
@@ -243,7 +243,7 @@ export async function updateUserById(req: Request, res: Response): Promise<void>
 
         // Validar que el ID sea válido
         if (!id || id.length !== 24) {
-           res.status(400).json({ message: "ID inválido" });
+           res.status(400).json({ message: "ID inválido updateUserById" });
         }
 
         // Validar que los datos requeridos estén presentes
@@ -296,7 +296,7 @@ export async function InactivateUserById(
   try {
     const id = req.params.id;
     if (!id || id.length !== 24) {
-      res.status(400).json({ message: "ID inválido" });
+      res.status(400).json({ message: "ID inválido InactivateUserById" });
     }
 
     const desactivatedUser = await userService.InactivateUserById(id);
@@ -386,6 +386,21 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
   } catch (error) {
     res.status(500).json({ message: "Error refreshing access token", error });
   }
+}
+
+export async function updateAvatar(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, avatar } = req.body;
+
+   console.log("aavatar\n\n\n", avatar);
+    
+    
+    const updatedAvatar = await userService.updateAvatar(avatar, email);
+    res.status(200).json(updatedAvatar);
+  } catch (error) {
+    res.status(500).json({ message: "Error refreshing access token", error });
+  }
+  
 }
 
 
