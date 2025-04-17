@@ -73,6 +73,7 @@ export async function getPedidosByUserId(
   try {
     const userId = req.params.idUser;
     const pedidos = await pedidosService.getPedidosByUserId(userId);
+    console.log(pedidos);
     res.status(200).json(pedidos);
   } catch (error) {
     res.status(500).json({ message: "Error getting orders", error });

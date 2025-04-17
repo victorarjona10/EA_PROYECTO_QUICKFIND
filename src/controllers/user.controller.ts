@@ -388,7 +388,7 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
     }
     const user = await UserModel.findOne({ refreshToken });
     if (!user) {
-      res.status(403).json({ message: "Refresh token inválido" });
+      res.status(410).json({ message: "Refresh token inválido" });
       return;
     }
     const { newAccessToken, newRefreshToken } = await userService.refreshTokenService(refreshToken);
