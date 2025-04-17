@@ -119,6 +119,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         }
 
         const user = await userService.getUserById(id);
+        console.log("user", user);
         if (!user) {
             res.status(404).json({ message: "Usuario no encontrado" });
         }
@@ -239,30 +240,40 @@ export async function getUserByEmail(
 export async function updateUserById(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
-        const user = req.body as IUser;
+        const user = req.body.user as Partial<IUser>;
+        console.log("user", user);
 
         // Validar que el ID sea válido
         if (!id || id.length !== 24) {
            res.status(400).json({ message: "ID inválido updateUserById" });
-        }
+           console.log("ID inválido updateUserById", id);
+           return;
+          }
 
         // Validar que los datos requeridos estén presentes
         if (!user.email) {
+          console.log(user.email);
            res.status(400).json({ message: "El email es obligatorio" });
-        }
+           console.log("El email es obligatorio", user.email);
+           return;
+          }
+
 
         const updatedUser = await userService.updateUserById(id, user);
         if (!updatedUser) {
            res.status(404).json({ message: "Usuario no encontrado" });
-        }
+           return;
+          }
 
         res.status(200).json(updatedUser);
     } catch (error: any) {
         if (error.code === 11000) {
             res.status(403).json({ message: "El email ya está registrado" });
-        } else {
+             return;
+          } else {
             res.status(500).json({ message: "Error al actualizar el usuario", error: error.message });
-        }
+            return;
+          }
     }
 }
 
