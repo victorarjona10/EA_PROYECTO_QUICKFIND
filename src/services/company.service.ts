@@ -16,7 +16,7 @@ export class CompanyService {
     }
 
     async getAllCompanies(): Promise<ICompany[]> {
-        return CompanyModel.find();
+        return CompanyModel.find().populate('products').exec();
     }
 
     async getCompanyById(id: string): Promise<ICompany | null> {

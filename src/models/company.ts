@@ -5,6 +5,7 @@ export interface ICompany {
   _id: ObjectId;
   name: string;
   rating: number;
+  userRatingsTotal: number;
   description: string;
   location: string;
   email: string;
@@ -14,12 +15,15 @@ export interface ICompany {
   products: ObjectId[];
   coordenates_lat: number;
   coordenates_lng: number;
+  icon: string;
+  photos?: string[];
 }
 
 
 const companySchema = new Schema<ICompany>({
     name: { type: String, required: true },
     rating: { type: Number, required: true },
+    userRatingsTotal: {type: Number, required: false},
     description: { type: String, required: true },
     location: { type: String, required: true },
     email: { type: String, required: true, unique: true, validate: {
@@ -34,6 +38,8 @@ const companySchema = new Schema<ICompany>({
     products: [{ type: Schema.Types.ObjectId, ref: "Product" , required: false}],
     coordenates_lat: { type: Number, required: true },
     coordenates_lng: { type: Number, required: true },
+    icon: {type: String, required: true},
+    photos: [{type: String, required: false}]
   });
   
   export const CompanyModel = model("Company", companySchema);

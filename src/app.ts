@@ -16,15 +16,9 @@ import axios from "axios";
 // Removed duplicate import of express
 const app = express();
 // Removed duplicate import of axios
-const PORT = 3000;
+const PORT = process.env.PORT || 4000;
 
-
-// Inicia el servidor
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
-
-app.set("port", process.env.PORT || 4000);
+app.set("port", PORT);
 app.use(corsHandler); //Middleware para gestionar las peticiones permitidas
 app.use(loggingHandler); //Middleware para registrar las peticiones por consola
 app.use(express.json());//Middleware para convertir JSON a objetos de JS a traves de req.body
@@ -43,9 +37,9 @@ app.use("/api/admins", adminRoutes);
 
 app.use(routeNotFound);//Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-app.listen(app.get("port"), () => {
-  console.log(`Server running on port ${app.get("port")}`);
-  console.log(`Swagger running at http://localhost:${app.get("port")}/api-docs/`);
+app.listen(PORT, () => {
+  console.log(`Server running at  http://localhost:${PORT}`);
+  console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
 });
 
 export default app;
