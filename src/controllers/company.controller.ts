@@ -1,0 +1,175 @@
+import { Request, Response } from 'express';
+import { ICompany } from '../models/company';
+import { CompanyService } from '../services/company.service';
+import { ProductModel } from '../models/product';
+import axios from 'axios';
+
+
+const companyService = new CompanyService();
+
+require('dotenv').config();
+
+export async function postCompany(req: Request, res: Response): Promise<void> {
+    try {
+        const company = req.body as ICompany;
+        if (!company.name || !company.email || !company.password) {
+            res.status(400).json({ message: "Nombre, email y contraseña son obligatorios" });
+        }
+
+        const newCompany = await companyService.postCompany(company);
+        res.status(201).json(newCompany);
+    } catch (error: any) {
+        if (error.code === 11000) {
+            res.status(403).json({ message: "El email ya está registrado" });
+        } else {
+            res.status(500).json({ message: "Error al crear la empresa", error: error.message });
+        }
+    }
+}
+
+export async function getAllCompanies(req: Request, res: Response): Promise<void> {
+    try {
+        const companies = await companyService.getAllCompanies();
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: "Error getting companies", error });
+    }
+}
+
+export async function getCompanyById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+        const company = await companyService.getCompanyById(id);
+        if (!company) {
+            res.status(404).json({ message: "Empresa no encontrada" });
+            return;
+        }
+        res.status(200).json(company);
+    } catch (error) {
+        res.status(500).json({ message: "Error getting company", error });
+    }
+}
+
+export async function updateCompanyById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+        const company = req.body as ICompany;
+        const updatedCompany = await companyService.updateCompanyById(id, company);
+        if (!updatedCompany) {
+            res.status(404).json({ message: "Empresa no encontrada" });
+            return;
+        }
+        res.status(200).json(updatedCompany);
+    } catch (error: any) {
+        if (error.message === "El email ya está registrado") {
+            // Enviar una respuesta clara para el error de email duplicado
+            res.status(403).json({ message: error.message });
+        } else {
+            // Manejo genérico de errores
+            res.status(500).json({ message: "Error al actualizar el usuario", error });
+        }
+    }
+}
+
+export async function deleteCompanyById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+        const deletedCompany = await companyService.deleteCompanyById(id);
+        if (!deletedCompany) {
+            res.status(404).json({ message: "Empresa no encontrada" });
+            return;
+        }
+        res.status(200).json(deletedCompany);
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting company", error });
+    }
+}
+
+export async function getCompanyWithProductsById(req: Request, res: Response): Promise<void> {
+    try {
+        const id = req.params.id;
+        if (!id || id.length !== 24) {
+            res.status(400).json({ message: "ID inválido" });
+        }
+        const company = await companyService.getCompanyWithProductsById(id);
+        if (!company) {
+            throw new Error('Company not found');
+        }
+        res.status(200).json(company);
+    } catch (error) {
+        res.status(500).json({ message: "Error getting company with products", error });
+    }
+}
+
+    
+
+
+    
+    export async function getCompanies(req: Request, res: Response): Promise<void> {
+      // Clave de API de Google Maps
+      const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY; // Reemplaza con tu clave de API
+      //const ejemplo_solicitud = 'http://localhost:3000/companies?query=restaurant&lat=41.2804038&lng=1.9848002&radius=300';
+      try {
+        // Obtén los parámetros de la consulta
+        const query = req.query.query as string || 'Carrefour'; // Palabra clave para buscar
+        const lat = parseFloat(req.query.lat as string) || 41.2804038; // Latitud
+        const lng = parseFloat(req.query.lng as string) || 1.9848002; // Longitud
+        const radius = parseInt(req.query.radius as string) || 300; // Radio en metros
+    
+        // URL de la API de Google Places
+        const url = `https://maps.googleapis.com/maps/api/place/textsearch/json`;
+    
+        // Realiza la solicitud a la API de Google Places
+        const response = await axios.get(url, {
+          params: {
+            query: query,
+            location: `${lat},${lng}`,
+            radius: radius,
+            key: GOOGLE_API_KEY,
+          },
+        });
+    
+        // Procesa los resultados para devolver solo los datos necesarios
+        const data = response.data as { results: any[] }; // Explicitly type response.data
+        const results = data.results.map((place: any) => ({
+            name: place.name,
+            address: place.formatted_address,
+            location: place.geometry?.location
+              ? {
+                  lat: place.geometry.location.lat,
+                  lng: place.geometry.location.lng,
+                }
+              : null,
+            rating: place.rating,
+            userRatingsTotal: place.user_ratings_total,
+            placeId: place.place_id,
+            types: place.types,
+            openingHours: place.opening_hours,
+            photos: place.photos?.map((photo: any) => ({
+              photoReference: photo.photo_reference,
+              width: photo.width,
+              height: photo.height,
+            })),
+            priceLevel: place.price_level,
+            businessStatus: place.business_status,
+            icon: place.icon,
+            vicinity: place.vicinity,
+            plusCode: place.plus_code,
+          }));
+    
+        // Devuelve los resultados al cliente
+        res.status(200).json(results);
+      } catch (error) {
+        console.error('Error al obtener lugares:');
+        res.status(500).json({ error: 'Error al obtener lugares' });
+      }
+    }
