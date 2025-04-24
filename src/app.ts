@@ -1,4 +1,5 @@
 import express, { RequestHandler, Request, Response } from "express";
+import path from "path";
 import { startConnection } from "./database";
 import { setupSwagger } from "./swagger";
 import userRoutes from "./routes/user.routes";
@@ -21,6 +22,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
 const app = express();
+app.use('/public', express.static(path.join(__dirname, '../public')));
 
 
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
