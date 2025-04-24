@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { IUser } from "../models/user";
 import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
@@ -414,5 +414,61 @@ export async function updateAvatar(req: Request, res: Response): Promise<void> {
   
 }
 
+import passport from "passport";
+
+export async function Google(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const origin = req.query.origin || 'http://localhost:3000';
+    const state = JSON.stringify({ origin }); // Incluye el origen en el estado
+    passport.authenticate('google', {
+      scope: ['profile', 'email'],
+      session: false,
+      state, // Pasa el estado a Google
+    })(req, res, next);
+  }
 
 
+import { v4 as uuidv4 } from 'uuid';
+import { generateToken } from '../utils/jwt.handle';
+
+
+export const googleCallback = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const state = JSON.parse((req.query.state as string) || '{}'); // Recupera el estado
+    const origin = state.origin || 'http://localhost:3000'; // Obtén el origen del estado
+    console.log("Origin from state:", origin);
+
+    const user = req.user as any;
+
+    // Genera el access token y el refresh token
+    const token = generateToken(user._id.toString(), user.email);
+    const refreshToken = uuidv4(); // Genera un nuevo refresh token
+
+    // Guarda el refresh token en la base de datos
+    await UserModel.findByIdAndUpdate(user._id, { refreshToken }); // Actualiza el usuario con el refresh token
+    console.log('Refresh token guardado en la base de datos');
+
+    // Devuelve un HTML que envía el token y el refresh token al frontend
+    res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({
+              token: '${token}',
+              refreshToken: '${refreshToken}',
+              user: {
+                _id: '${user._id}',
+                name: '${user.name}',
+                email: '${user.email}',
+                avatar: '${user.avatar || ''}'
+              }
+            }, '${origin}');
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('Error en googleCallback:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+};
