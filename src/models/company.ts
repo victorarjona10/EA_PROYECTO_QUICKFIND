@@ -17,6 +17,7 @@ export interface ICompany {
   coordenates_lng: number;
   icon: string;
   photos?: string[];
+  followers: number;
 }
 
 
@@ -39,7 +40,8 @@ const companySchema = new Schema<ICompany>({
     coordenates_lat: { type: Number, required: true },
     coordenates_lng: { type: Number, required: true },
     icon: {type: String, required: true},
-    photos: [{type: String, required: false}]
+    photos: [{type: String, required: false}],
+    followers: { type: Number, required: true, default: 0 },
   });
   
   export const CompanyModel = model("Company", companySchema);

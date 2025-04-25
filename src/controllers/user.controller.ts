@@ -5,6 +5,10 @@ import { UserService } from "../services/user.service";
 import { ObjectId } from "mongoose";
 import { RequestExt } from "../middleware/session";
 import { UserModel } from "../models/user";
+import { v4 as uuidv4 } from 'uuid';
+import { generateToken } from '../utils/jwt.handle';
+import passport from "passport";
+
 
 const userService = new UserService();
 
@@ -414,7 +418,7 @@ export async function updateAvatar(req: Request, res: Response): Promise<void> {
   
 }
 
-import passport from "passport";
+
 
 export async function Google(req: Request, res: Response, next: NextFunction): Promise<void> {
     const origin = req.query.origin || 'http://localhost:3000';
@@ -427,8 +431,6 @@ export async function Google(req: Request, res: Response, next: NextFunction): P
   }
 
 
-import { v4 as uuidv4 } from 'uuid';
-import { generateToken } from '../utils/jwt.handle';
 
 
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {
@@ -472,3 +474,31 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
     res.status(500).send('Error interno del servidor');
   }
 };
+
+export async function addFollowed (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const {companyId}  = req.body;
+    console.log("userId:", userId);
+    console.log("companyId:", companyId);
+    const updatedUser = await userService.FollowCompany(userId, companyId);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in addFollowed:", error);
+    res.status(500).json({ message: "Error adding followed", error });
+  }
+}
+
+export async function UnfollowCompany (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const {companyId}  = req.body;
+    console.log("userId:", userId);
+    console.log("companyId:", companyId);
+    const updatedUser = await userService.UnfollowCompany(userId, companyId);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in addFollowed:", error);
+    res.status(500).json({ message: "Error adding followed", error });
+  }
+}

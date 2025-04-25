@@ -4,6 +4,7 @@ import { verified } from "../utils/bcrypt.handle";
 import { generateToken } from "../utils/jwt.handle";
 import {encrypt} from "../utils/bcrypt.handle";
 import { v4 as uuidv4 } from "uuid";
+import { ICompany, CompanyModel } from "../models/company";
 
 import { Profile } from "passport-google-oauth20";
 
@@ -181,6 +182,55 @@ export class UserService {
 
     });
 
+
+
     return await newUser.save();
+  }
+
+  async FollowCompany(userId: string, companyId: string): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    const alreadyFollowed = user.company_Followed.some(
+      (company) => company.company_id.toString() === companyId
+    );
+
+    if (alreadyFollowed) {
+      throw new Error("Ya sigues esta empresa");
+    }
+      
+    user.company_Followed.push({ company_id: new mongoose.Types.ObjectId(companyId) });
+    const company = await CompanyModel.findById(companyId);
+    if (company) {
+      company.followers++;
+      console.log ("Followers incrementados:", company.followers);
+      await company.save();
+    }
+    return await user.save();
+    
+  }
+
+  async UnfollowCompany(userId: string, companyId: string): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    const companyIndex = user.company_Followed.findIndex(
+      (company) => company.company_id.toString() === companyId
+    );
+
+    if (companyIndex === -1) {
+      throw new Error("No sigues esta empresa");
+    }
+
+    user.company_Followed.splice(companyIndex, 1);
+    const company = await CompanyModel.findById(companyId);
+    if (company) {
+      company.followers--;
+      await company.save();
+    }
+    return await user.save();
   }
 }

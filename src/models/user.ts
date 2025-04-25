@@ -1,4 +1,5 @@
 import {ObjectId, Schema, model} from 'mongoose';
+import mongoose from 'mongoose';
 
 export interface IUser {
   _id: ObjectId;
@@ -13,6 +14,9 @@ export interface IUser {
   refreshToken?: string; 
   refreshTokenExpiry?: Date; 
   googleId?: string; // Optional field for Google ID
+  company_Followed: {
+    company_id: mongoose.Types.ObjectId;
+  }[];
 }
 
 const userSchema = new Schema<IUser>({
@@ -32,6 +36,15 @@ const userSchema = new Schema<IUser>({
   refreshToken: { type: String },
   refreshTokenExpiry: { type: Date, default: null },
   googleId: { type: String, required: false }, // Optional field for Google ID
+  company_Followed: [
+    {
+      company_id: {
+        type: mongoose.Types.ObjectId, 
+        ref: 'Company', 
+        required: false
+      },
+    },
+  ],
 
 });
 
