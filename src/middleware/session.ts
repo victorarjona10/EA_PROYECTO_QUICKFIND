@@ -10,7 +10,7 @@ const checkJwt = (req: RequestExt, res: Response, next: NextFunction): void => {
     try {
         const jwtByUser = req.headers.authorization || null;
         const jwt = jwtByUser?.split(' ').pop(); // ['Bearer', '11111'] -> ['11111']
-        console.log("Token recibido:", jwt);
+        console.log("Acces token recibido:", jwt);
 
         const isUser = verifyToken(`${jwt}`);
         

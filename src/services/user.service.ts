@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ICompany, CompanyModel } from "../models/company";
 
 import { Profile } from "passport-google-oauth20";
+import { userInfo } from "os";
 
 export class UserService {
 
@@ -129,28 +130,34 @@ export class UserService {
 
 
   async refreshTokenService(refreshToken: string): Promise<{ newAccessToken: string, newRefreshToken: string }> {
-      const user = await UserModel.findOne({ refreshToken });
-      if (!user) {
-          throw new Error("Refresh Token inválido");
-      }
+    const user = await UserModel.findOne({ refreshToken });
+    if (!user) {
+      console.error("Refresh Token no encontrado en la base de datos.");
+      throw new Error("Refresh Token inválido");
+    }
   
-      // Verificar si el Refresh Token ha caducado
-      if (user.refreshTokenExpiry && new Date() > user.refreshTokenExpiry) {
-          throw new Error("Refresh Token caducado");
-      }
-      console.log("Parametros de usuario:", user); // Log para verificar los parámetros del usuario
-      // Generar un nuevo Access Token y Refresh Token
-      const newAccessToken = generateToken(user.id ,user.email);
-      const newRefreshToken = uuidv4();
-      const newRefreshTokenExpiry = new Date();
-      newRefreshTokenExpiry.setDate(newRefreshTokenExpiry.getDate() + 7); // Expira en 7 días
+    // Verificar si el Refresh Token ha caducado
+    if (user.refreshTokenExpiry && new Date() > user.refreshTokenExpiry) {
+      console.error("Refresh Token caducado.");
+      throw new Error("Refresh Token caducado");
+    }
   
-      // Actualizar el Refresh Token en la base de datos
-      user.refreshToken = newRefreshToken;
-      user.refreshTokenExpiry = newRefreshTokenExpiry;
-      await user.save();
+    console.log("Refresh Token válido. Generando nuevos tokens...");
   
-      return { newAccessToken, newRefreshToken };
+    // Generar un nuevo Access Token y Refresh Token
+    const newAccessToken = generateToken(user.id, user.email);
+    const newRefreshToken = uuidv4();
+    const newRefreshTokenExpiry = new Date();
+    newRefreshTokenExpiry.setDate(newRefreshTokenExpiry.getDate() + 7); // Expira en 7 días
+  
+    // Actualizar el Refresh Token en la base de datos
+    user.refreshToken = newRefreshToken;
+    user.refreshTokenExpiry = newRefreshTokenExpiry;
+    await user.save();
+  
+    console.log("Nuevo Refresh Token generado y guardado:", newRefreshToken);
+  
+    return { newAccessToken, newRefreshToken };
   }
 
   async updateAvatar( avatar:string, email: string): Promise<IUser | null>{
@@ -201,6 +208,7 @@ export class UserService {
     }
       
     user.company_Followed.push({ company_id: new mongoose.Types.ObjectId(companyId) });
+    console.log("Company_Followed:", user);
     const company = await CompanyModel.findById(companyId);
     if (company) {
       company.followers++;
@@ -233,4 +241,19 @@ export class UserService {
     }
     return await user.save();
   }
+  //funcion para obtener la lista de empresas seguidas por el usuario
+  async  getFollowedCompanies(userId: string): Promise<ICompany[]> {
+    const user = await UserModel.findById(userId).populate("company_Followed.company_id");
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    return user.company_Followed.map((company) => {
+        if (company.company_id instanceof mongoose.Types.ObjectId) {
+            throw new Error("Company data is not populated");
+        }
+        return company.company_id as ICompany;
+    });
 }
+
+}
+

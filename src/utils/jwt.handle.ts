@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "token.010101010101"; //Definimos u
 
 //No debemos pasar información sensible en el payload, en este caso vamos a pasar como parametro el ID del usuario
 const generateToken = (id:string, email: string) => {
-    const jwt = sign({id, email}, JWT_SECRET, {expiresIn: '80s'});
+    const jwt = sign({id, email}, JWT_SECRET, {expiresIn: '8s'});
     return jwt;
 };
 

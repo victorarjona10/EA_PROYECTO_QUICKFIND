@@ -387,19 +387,26 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
 export async function refreshAccesToken(req: Request, res: Response): Promise<void> {
   try {
     const { refreshToken } = req.body;
+    console.log("RefreshToken recibido:", refreshToken);
+
     if (!refreshToken) {
       res.status(400).json({ message: "Refresh token es obligatorio" });
-    }
-    const user = await UserModel.findOne({ refreshToken });
-    if (!user) {
-      res.status(410).json({ message: "Refresh token inválido" });
       return;
     }
+
     const { newAccessToken, newRefreshToken } = await userService.refreshTokenService(refreshToken);
 
-    res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken  });
-  } catch (error) {
-    res.status(500).json({ message: "Error refreshing access token", error });
+    console.log("Enviando nuevo RefreshToken:", newRefreshToken);
+    res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
+  } catch (error: any) {
+    if (error.message === "Refresh Token inválido") {
+      res.status(410).json({ message: "Refresh token inválido" });
+    } else if (error.message === "Refresh Token caducado") {
+      res.status(401).json({ message: "Refresh token caducado" });
+    } else {
+      console.error("Error al refrescar el token:", error);
+      res.status(500).json({ message: "Error interno del servidor", error });
+    }
   }
 }
 
@@ -500,5 +507,18 @@ export async function UnfollowCompany (req: Request, res: Response): Promise<voi
   } catch (error) {
     console.error("Error in addFollowed:", error);
     res.status(500).json({ message: "Error adding followed", error });
+  }
+}
+
+//funcion que usa user service para obtener las compañias que sigue un usuario
+export async function getFollowedCompanies (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    console.log("userId:", userId);
+    const followedCompanies = await userService.getFollowedCompanies(userId);
+    res.status(200).json(followedCompanies);
+  } catch (error) {
+    console.error("Error in getFollowedCompanies:", error);
+    res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
