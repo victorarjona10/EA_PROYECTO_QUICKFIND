@@ -52,4 +52,15 @@ export class CompanyService {
     async getCompanyWithProductsById(id: string): Promise<ICompany | null> {
         return CompanyModel.findById(id).populate('products').exec();
     }
+
+    async RateCompany(id: string, rating: number): Promise<ICompany | null> {
+        const company = await CompanyModel.findById(id);
+        if (!company) {
+            throw new Error("Company not found");
+        }   
+        const newRating = (company.rating * company.userRatingsTotal + rating) / (company.userRatingsTotal + 1);
+        company.rating = newRating;
+        company.userRatingsTotal += 1;
+        return company.save();
+    }
 }

@@ -3,6 +3,7 @@ import { ICompany } from '../models/company';
 import { CompanyService } from '../services/company.service';
 import { ProductModel } from '../models/product';
 import axios from 'axios';
+import exp from 'constants';
 
 
 const companyService = new CompanyService();
@@ -172,4 +173,22 @@ export async function getCompanyWithProductsById(req: Request, res: Response): P
         console.error('Error al obtener lugares:');
         res.status(500).json({ error: 'Error al obtener lugares' });
       }
+    }
+
+    export async function RateCompany(req: Request, res: Response): Promise<void> {
+        try {
+            const id = req.params.id;
+            if (!id || id.length !== 24) {
+                res.status(400).json({ message: "ID inválido" });
+            }
+            const { rating } = req.body as { rating: number };
+            const updatedCompany = await companyService.RateCompany(id, rating);
+            if (!updatedCompany) {
+                res.status(404).json({ message: "Empresa no encontrada" });
+                return;
+            }
+            res.status(200).json(updatedCompany);
+        } catch (error) {
+            res.status(500).json({ message: "Error al calificar la empresa", error });
+        }
     }
