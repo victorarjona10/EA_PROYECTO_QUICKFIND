@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "cd src && npx ts-node app.ts"
+    "start": "cd src && npx ts-node app.ts",
+    "start:prod": "node dist/app.js"
   },
   "dependencies": {
     "@types/passport": "^1.0.17",
