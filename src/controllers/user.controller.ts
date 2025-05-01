@@ -42,20 +42,25 @@ export async function postUser(req: Request, res: Response): Promise<void> {
         // Validar que los datos requeridos estén presentes
         if (!user.email || !user.password) {
             res.status(400).json({ message: "Email y contraseña son obligatorios" });
+            return;
         }
 
         const newUser = await userService.postUser(user);
         res.status(201).json(newUser);
+        return;
     } catch (error: any) {
         if (error.code === 11000) {
             // Error de duplicado en MongoDB
             res.status(403).json({ message: "El email ya está registrado" });
+            return;
         } else if (error.name === "ValidationError") {
             // Error de validación de Mongoose
             res.status(400).json({ message: "Datos inválidos", details: error.errors });
+            return;
         } else {
             // Error genérico
             res.status(500).json({ message: "Error al crear el usuario", error: error.message });
+            return;
         }
     }
 }
@@ -85,8 +90,10 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
     const limit = parseInt(req.query.limit as string) || 25;
     const users = await userService.getAllUsers(page, limit);
     res.status(200).json(users);
+    return;
   } catch (error) {
     res.status(500).json({ message: "Error getting users", error });
+    return;
   }
 }
 
@@ -120,17 +127,21 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         // Validar que el ID sea válido
         if (!id || id.length !== 24) {
             res.status(400).json({ message: "ID inválido getUserById" });
+            return;
         }
 
         const user = await userService.getUserById(id);
         console.log("user", user);
         if (!user) {
             res.status(404).json({ message: "Usuario no encontrado" });
+            return;
         }
 
         res.status(200).json(user);
+        return;
     } catch (error) {
         res.status(500).json({ message: "Error al obtener el usuario", error: (error as any).message });
+        return;
     }
 }
 /**
