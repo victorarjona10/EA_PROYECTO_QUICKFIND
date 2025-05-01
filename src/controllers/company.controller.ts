@@ -4,7 +4,7 @@ import { CompanyService } from '../services/company.service';
 import { ProductModel } from '../models/product';
 import axios from 'axios';
 import exp from 'constants';
-
+import { IReview } from '../models/review';
 
 const companyService = new CompanyService();
 
@@ -190,5 +190,50 @@ export async function getCompanyWithProductsById(req: Request, res: Response): P
             res.status(200).json(updatedCompany);
         } catch (error) {
             res.status(500).json({ message: "Error al calificar la empresa", error });
+        }
+    }
+
+    export async function reviewCompany(req: Request, res: Response): Promise<void> {
+        try {
+            const review = req.body.review as Partial<IReview>;
+    
+            // Validación de datos obligatorios
+            if (!review.user_id || !review.company_id || review.rating === undefined) {
+                console.error("Faltan datos obligatorios para crear o actualizar la reseña:", review);
+                res.status(400).json({ message: "Faltan datos obligatorios para crear o actualizar la reseña" });
+                return; // Detiene la ejecución
+            }
+    
+            // Llama al servicio para procesar la reseña
+            const newReview = await companyService.reviewCompany(review);
+    
+            // Envía la respuesta al cliente
+            res.status(200).json(newReview);
+            return; // Detiene la ejecución
+        } catch (error) {
+            console.error("Error en reviewCompany:", error);
+    
+            // Envía una respuesta de error al cliente
+            res.status(500).json({ message: "Error al crear o actualizar la reseña", error });
+            return; // Detiene la ejecución
+        }
+    }
+
+    export async function getCompanyReviews(req: Request, res: Response): Promise<void> {
+        try {
+            const id = req.params.id;
+            if (!id || id.length !== 24) {
+                res.status(400).json({ message: "ID inválido" });
+                return;
+            }
+            const reviews = await companyService.getCompanyReviews(id);
+            if (!reviews) {
+                res.status(404).json({ message: "Reseñas no encontradas" });
+                return;
+            }
+            res.status(200).json(reviews);
+        } catch (error) {
+            res.status(500).json({ message: "Error al obtener las reseñas de la empresa", error });
+            return;
         }
     }
