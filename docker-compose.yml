@@ -1,0 +1,25 @@
+version: "1.0.0"
+services:
+  miapi:
+    image: api_proyecto_compilacion:latest
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+    networks:
+      - public
+      - db-tier
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - db-tier
+    volumes:
+      - "C:/TELECOS/3B/EA/MongoDB_DATA/new_db:/data/db"
+      - "C:/TELECOS/3B/EA/MongoDB_DATA/new_backup:/backup"
+
+networks:
+  public:
+    external: true
+  db-tier:
