@@ -35,7 +35,7 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
     }
 
     const newPedido = await pedidosService.postPedido(pedido);
-    res.status(201).json(newPedido);
+    res.status(200).json(newPedido);
   } catch (error:any) {
     res.status(500).json({ message: "Error creating order", error: error.message });
   }
