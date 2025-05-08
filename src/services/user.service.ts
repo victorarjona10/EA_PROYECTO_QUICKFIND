@@ -255,5 +255,18 @@ export class UserService {
     });
 }
 
+async getCompaniesByOwnerId(userId: string): Promise<ICompany[]> {
+  try {
+    // Buscar todas las compañías cuyo ownerId coincida con el userId proporcionado
+    const companies = await CompanyModel.find({ ownerId: userId });
+    if (companies.length === 0) {
+      throw new Error("No se encontraron compañías para este usuario");
+    }
+    return companies;
+  } catch (error) {
+    console.error("Error al obtener las compañías del usuario:", error);
+    throw error;
+  }
 }
 
+}

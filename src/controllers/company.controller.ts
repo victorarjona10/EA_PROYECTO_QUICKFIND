@@ -16,6 +16,10 @@ export async function postCompany(req: Request, res: Response): Promise<void> {
         if (!company.name || !company.email || !company.password) {
             res.status(400).json({ message: "Nombre, email y contraseña son obligatorios" });
         }
+        if (!company.ownerId)
+        {
+            res.status(400).json({ message: "El id del propietario es obligatorio" });
+        }
 
         const newCompany = await companyService.postCompany(company);
         res.status(201).json(newCompany);

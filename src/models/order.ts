@@ -9,6 +9,7 @@ export interface IOrder {
     quantity: number;
     //unit_price: number;
   }[];
+  company_id: ObjectId;
   orderDate: Date;
   status: string;
 }
@@ -27,6 +28,7 @@ const orderSchema = new Schema<IOrder>({
       //unit_price: { type: Number, required: true }
     },
   ],
+  company_id: { type: Schema.Types.ObjectId, ref: "Company", required: true },
   orderDate: { type: Date, default: Date.now },
   status: {
     type: String,

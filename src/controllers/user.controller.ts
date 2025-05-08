@@ -533,3 +533,16 @@ export async function getFollowedCompanies (req: Request, res: Response): Promis
     res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
+
+//funcion obtener todas las compañias de un usuario
+export async function getAllCompanies (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    console.log("userId:", userId);
+    const allCompanies = await userService.getCompaniesByOwnerId(userId);
+    res.status(200).json(allCompanies);
+  } catch (error) {
+    console.error("Error in getFollowedCompanies:", error);
+    res.status(500).json({ message: "Error getting followed companies", error });
+  }
+}

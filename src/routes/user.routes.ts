@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 const router = Router();
 import { v4 as uuidv4 } from 'uuid';
-import {getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
+import {getAllCompanies, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
 import passport from 'passport';
 import { generateToken } from '../utils/jwt.handle';
 
@@ -17,7 +17,7 @@ router.get('/:id', checkJwt,  getUserById);
 router.get('/name/:name', checkJwt,  getUserByName);
 router.get('/email/:email', checkJwt,  getUserByEmail);
 router.get('/followedCompanies/:id', checkJwt,  getFollowedCompanies);
-
+router.get('/companies/:id', checkJwt,  getAllCompanies);
 router.put("/uptdateAvatar", checkJwt, updateAvatar);
 
 router.put('/:id', checkJwt,  updateUserById);
