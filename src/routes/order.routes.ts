@@ -4,7 +4,7 @@ import { checkJwt } from '../middleware/session';
 
 const router = Router();
 
-router.post("/", checkJwt,  postPedido);   
+router.post("/",  postPedido);   
 router.get('/:id', checkJwt,  getPedidoById);
 router.put('/:id', checkJwt,  updatePedidoById);
 router.delete('/:id', checkJwt,  deletePedidoById);
