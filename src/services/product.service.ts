@@ -1,3 +1,4 @@
+import { compare } from 'bcryptjs';
 import { IProduct, ProductModel } from '../models/product';
 
 export class ProductService {
@@ -21,4 +22,6 @@ export class ProductService {
     async deleteProductById(id: string): Promise<IProduct | null> {
         return ProductModel.findByIdAndDelete(id);
     }
+
+
 }

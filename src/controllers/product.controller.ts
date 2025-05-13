@@ -205,5 +205,3 @@ export async function deleteProductById(req: Request, res: Response): Promise<vo
         res.status(500).json({ message: "Error deleting product", error: (error as any).message });
     }
 }
-
-

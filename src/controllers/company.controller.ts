@@ -8,6 +8,7 @@ import { IReview } from "../models/review";
 
 const companyService = new CompanyService();
 
+
 require("dotenv").config();
 
 export async function postCompany(req: Request, res: Response): Promise<void> {
@@ -321,5 +322,39 @@ export async function addProductToCompany(
         error: error.message,
       });
     }
+  }
+}
+
+export async function getCompanyByName(req: Request, res: Response): Promise<void> {
+  try {
+    const searchText = req.params.search as string;
+
+    if (!searchText) {
+      res.status(400).json({ message: "El texto de búsqueda es obligatorio" });
+      return;
+    }
+
+    const companies = await companyService.getCompanyByName(searchText);
+    res.status(200).json(companies);
+  } catch (error) {
+    console.error("Error en getCompanySearch Controller:", error);
+    res.status(500).json({ message: "Error al buscar compañías"});
+  }
+}
+
+export async function getCompaniesByProductName(req: Request, res: Response): Promise<void> {
+  try {
+    const productName = req.params.name;
+
+    if (!productName) {
+      res.status(400).json({ message: "El nombre del producto es obligatorio" });
+      return;
+    }
+
+    const companies = await companyService.getCompaniesByProductName(productName);
+    res.status(200).json(companies);
+  } catch (error) {
+    console.error("Error en getCompaniesByProductName Controller:", error);
+    res.status(500).json({ message: "Error al buscar empresas por nombre de producto" });
   }
 }
