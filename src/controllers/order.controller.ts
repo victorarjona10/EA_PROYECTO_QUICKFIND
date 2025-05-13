@@ -228,4 +228,17 @@ export async function deleteProductFromOrder(
   }
 }
 
+export async function getAllCompanyOrders(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const companyId = req.params.idCompany;
+    const orders = await pedidosService.getAllCompanyOrders(companyId);
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting orders", error });
+  }
+}
+
 

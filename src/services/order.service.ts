@@ -80,4 +80,9 @@ async deletePedidoById(id: string) {
             throw error;
         }
     }
+
+    async getAllCompanyOrders(companyId: string) {
+        return await OrderModel.find({ company_id: companyId }).populate('user_id').populate('products.product_id').exec();
+        
+    }
 }
