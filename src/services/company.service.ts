@@ -1,6 +1,7 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
 import { IProduct, ProductModel } from "../models/product";
+import { verified } from "../utils/bcrypt.handle";
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
@@ -181,4 +182,25 @@ export class CompanyService {
       throw error;
     }
   }
+
+  
+    async loginCompany(email: string, password: string): Promise<{ company: ICompany }> {
+        const company = await CompanyModel.findOne({ email });
+        if (!company) {
+          throw new Error("Email o contraseña incorrectos");
+        }
+    
+        // Comparación directa de contraseñas
+        const isPasswordValid = await verified(password, company.password); 
+        if (!isPasswordValid) {
+          throw new Error("Email o contraseña incorrectos");
+        }
+    
+        return {  company: company.toObject() as ICompany};
+        //return { token, refreshToken };
+      }
+    
 }
+
+
+
