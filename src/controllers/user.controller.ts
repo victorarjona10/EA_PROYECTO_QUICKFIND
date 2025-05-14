@@ -140,6 +140,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         res.status(200).json(user);
         return;
     } catch (error) {
+      console.log("Error en getUserById:", error)
         res.status(500).json({ message: "Error al obtener el usuario", error: (error as any).message });
         return;
     }
