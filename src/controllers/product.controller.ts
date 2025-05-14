@@ -47,6 +47,9 @@ export async function postProduct(req: Request, res: Response): Promise<void> {
             res.status(500).json({ message: "Error al crear el producto", error: error.message });
         }
     }
+
+
+    console.log("Producto creado:", req.body);
 }
 
 /**
