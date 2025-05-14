@@ -10,8 +10,8 @@
     "prepare": "husky"
   },
   "lint-staged": {
-  "*.{js,ts}": "eslint"
-},
+  "**/*.{js,ts}": "eslint"
+  },
   "dependencies": {
     "@types/passport": "^1.0.17",
     "@types/swagger-jsdoc": "^6.0.4",

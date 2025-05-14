@@ -132,6 +132,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
 
         const user = await userService.getUserById(id);
         console.log("user", user);
+        console.log("id", id);
         if (!user) {
             res.status(404).json({ message: "Usuario no encontrado" });
             return;
