@@ -134,6 +134,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         console.log("user", user);
         console.log("id", id);
         console.log("userId");
+        console.log("semao");
         const userId = id;
         console.log("userId", userId);
         if (!user) {

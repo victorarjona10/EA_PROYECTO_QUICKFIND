@@ -10,7 +10,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-  "**/*.{js,ts}": "eslint"
+    "**/*.{js,ts}": "eslint"
   },
   "dependencies": {
     "@types/passport": "^1.0.17",
@@ -49,7 +49,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
-    "eslint": "^9.26.0",
+    "eslint": "^8.57.1",
     "globals": "^16.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
