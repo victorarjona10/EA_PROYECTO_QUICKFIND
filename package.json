@@ -6,11 +6,12 @@
     "build": "tsc",
     "start": "cd src && npx ts-node app.ts",
     "start:prod": "node dist/app.js",
-    "lint": "eslint src/**/*.{js,ts}"
+    "lint": "eslint src/**/*.{js,ts}",
+    "prepare": "husky"
   },
   "lint-staged": {
     "src/**/*.{js,ts}": "eslint"
-},
+  },
   "dependencies": {
     "@types/passport": "^1.0.17",
     "@types/swagger-jsdoc": "^6.0.4",
@@ -55,6 +56,4 @@
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.32.1"
   }
-
-  
 }
