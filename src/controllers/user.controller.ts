@@ -133,6 +133,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         const user = await userService.getUserById(id);
         console.log("user", user);
         console.log("id", id);
+        console.log("userId");
         const userId = id;
         console.log("userId", userId);
         if (!user) {
@@ -550,5 +551,3 @@ export async function getAllCompanies (req: Request, res: Response): Promise<voi
     res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
-c o n s o l e . l o g ( " t e s t " )  
- 
