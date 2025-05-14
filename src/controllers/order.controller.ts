@@ -43,6 +43,7 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
   }
 }
 
+
 /**
  * @swagger
  * /api/pedidos/usuario/{idUsuario}:
