@@ -21,4 +21,5 @@ export class ProductService {
     async deleteProductById(id: string): Promise<IProduct | null> {
         return ProductModel.findByIdAndDelete(id);
     }
+    
 }

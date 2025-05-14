@@ -3,10 +3,10 @@ import { checkJwt } from '../middleware/session';
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 const router = Router();
-import { v4 as uuidv4 } from 'uuid';
 import {getAllCompanies, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
 import passport from 'passport';
-import { generateToken } from '../utils/jwt.handle';
+
+
 
 
 router.get( "/ActiveUsers/", checkJwt, getAllActiveUsers);

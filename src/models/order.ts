@@ -14,6 +14,7 @@ export interface IOrder {
   status: string;
 }
 
+
 // Creación del esquema del pedido
 const orderSchema = new Schema<IOrder>({
   user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },

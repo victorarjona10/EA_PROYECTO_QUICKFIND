@@ -13,6 +13,7 @@ export interface IAdmin {
   //reservas--productos
 }
 
+
 const AdminSchema = new Schema<IAdmin>({
   name: { type: String, required: false },
   email: { type: String, required: true, unique: true, validate: {

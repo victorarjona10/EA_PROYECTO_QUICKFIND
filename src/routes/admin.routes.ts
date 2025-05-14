@@ -14,6 +14,7 @@ import { checkJwt } from "../middleware/session";
 const router = Router();
 
 
+
 router.post("/", checkJwt,  postAdmin);
 router.get("/", checkJwt, getAllAdmins);
 router.get("/:id", checkJwt, getAdminById);

@@ -31,9 +31,8 @@ const productService = new ProductService();
 
 export async function postProduct(req: Request, res: Response): Promise<void> {
     try {
-        console.log(req.body);
+
         const product = req.body as IProduct;
-        console.log(product);
         if (!product.name || !product.price || !product.description) {
             res.status(400).json({ message: "Nombre, precio y descripción son obligatorios" });
         }
@@ -47,10 +46,8 @@ export async function postProduct(req: Request, res: Response): Promise<void> {
             res.status(500).json({ message: "Error al crear el producto", error: error.message });
         }
     }
-
-
-    console.log("Producto creado:", req.body);
 }
+
 
 /**
  * @swagger

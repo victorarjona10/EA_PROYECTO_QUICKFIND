@@ -11,3 +11,4 @@ const verified = async (pass: string, passHash: string) => {
 };
 export { encrypt, verified };
 
+

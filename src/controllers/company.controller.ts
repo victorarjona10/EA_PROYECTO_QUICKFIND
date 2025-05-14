@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { ICompany } from "../models/company";
 import { CompanyService } from "../services/company.service";
-import { ProductModel } from "../models/product";
 import axios from "axios";
-import exp from "constants";
+
 import { IReview } from "../models/review";
 
 const companyService = new CompanyService();
 
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function postCompany(req: Request, res: Response): Promise<void> {
   try {
@@ -343,3 +343,5 @@ export async function addProductToCompany(
     }
 
 
+
+    

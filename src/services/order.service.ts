@@ -14,6 +14,7 @@ export class PedidosService {
     async getPedidoById(id: string) {
         return await OrderModel.findById(id).populate('user_id').populate('products.product_id').exec();
     }
+    
 
     // async updatePedidoById(id: string, pedido: IOrder) {
     //     return await OrderModel.findByIdAndUpdate(id, pedido, { new: true }).populate('user_id').populate('products.product_id').exec();
@@ -30,7 +31,7 @@ export class PedidosService {
     // }
 
     async updatePedidoById(id: string, updateData: Partial<IOrder>) {
-        try {
+        
             if (updateData.products && Array.isArray(updateData.products)) {
                 const updates = updateData.products.map(product => ({
                     updateOne: {
@@ -40,18 +41,16 @@ export class PedidosService {
                 }));
     
                 await OrderModel.bulkWrite(updates);//por si queremos actualizar multiples cosas del vector de products se usa blikWrite
-            }
+            
     
             // Actualiza otros campos fuera del array de productos
-            const { products, ...otherFields } = updateData; 
+            const otherFields = { ...updateData };
+            delete otherFields.products;
             if (Object.keys(otherFields).length > 0) {
                 return await OrderModel.updateOne({ _id: id }, { $set: otherFields });
             }
     
             return { message: "Update successful" };
-        } catch (error: any) {
-            console.log(error);
-            throw error;
         }
     }
 
@@ -64,7 +63,7 @@ async deletePedidoById(id: string) {
 }
 
     async deleteProductFromOrder(orderId: string, productId: string): Promise<any> {
-        try {
+        
             const result = await OrderModel.updateOne(
                 { _id: orderId }, // Filtro para encontrar el pedido
                 { $pull: { products: { product_id: productId } } } // Elimina el producto con el product_id especificado
@@ -75,10 +74,7 @@ async deletePedidoById(id: string) {
             }
 
             return { message: `Product deleted from order with id: ${orderId}` };
-        } catch (error: any) {
-            console.log(error);
-            throw error;
-        }
+        
     }
 
     async getAllCompanyOrders(companyId: string) {

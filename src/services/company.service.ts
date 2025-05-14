@@ -1,6 +1,6 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
-import { IProduct, ProductModel } from "../models/product";
+import {  ProductModel } from "../models/product";
 import { verified } from "../utils/bcrypt.handle";
 
 export class CompanyService {
@@ -12,7 +12,6 @@ export class CompanyService {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
   }
@@ -46,7 +45,6 @@ export class CompanyService {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
   }
@@ -99,6 +97,7 @@ export class CompanyService {
       if (!updatedReview) {
         throw new Error("Error al actualizar la reseña");
       }
+      
 
       // Actualiza la calificación de la empresa
       const updatedRating = parseFloat(
@@ -137,14 +136,12 @@ export class CompanyService {
   }
 
   async getCompanyReviews(companyId: string): Promise<IReview[]> {
-    console.log("Company ID:", companyId);
     if (!companyId || companyId.length !== 24) {
       throw new Error("ID inválido");
     }
-    const reviews = await ReviewModel.find({ company_id: companyId })
+    await ReviewModel.find({ company_id: companyId })
       .populate("user_id")
       .exec();
-    console.log("Reviews:", reviews);
     return ReviewModel.find({ company_id: companyId })
       .populate("user_id")
       .exec();

@@ -15,6 +15,7 @@ import {
 } from "../controllers/company.controller";
 import { checkJwt } from "../middleware/session";
 
+
 const router = Router();
 router.get("/companies", checkJwt, getCompanies);
 router.get("/", checkJwt, getAllCompanies);

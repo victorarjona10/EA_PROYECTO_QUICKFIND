@@ -29,11 +29,8 @@ const pedidosService = new PedidosService();
 export async function postPedido(req: Request, res: Response): Promise<void> {
   try {
     const pedido = req.body as IOrder;
-    console.log(pedido);
     if (!pedido.user_id || !pedido.products || pedido.products.length === 0) {
-      console.log("Error: User ID, Product ID and quantity are required");
       res.status(400).json({ message: "User ID, Product ID and quantity are required" });
-      
     }
 
     const newPedido = await pedidosService.postPedido(pedido);
@@ -76,12 +73,12 @@ export async function getPedidosByUserId(
   try {
     const userId = req.params.idUser;
     const pedidos = await pedidosService.getPedidosByUserId(userId);
-    console.log(pedidos);
     res.status(200).json(pedidos);
   } catch (error) {
     res.status(500).json({ message: "Error getting orders", error });
   }
 }
+
 
 /**
  * @swagger

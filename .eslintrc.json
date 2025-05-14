@@ -26,5 +26,13 @@
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "no-shadow": "error",
     "@typescript-eslint/no-shadow": ["error"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/middleware/**/*.ts", "src/app.ts", "src/database.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

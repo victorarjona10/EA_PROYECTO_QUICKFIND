@@ -12,3 +12,5 @@ router.get("/AllOrdersByUser/:idUser", checkJwt, getPedidosByUserId);
 router.put('/:orderId/:productId', checkJwt, deleteProductFromOrder);
 router.get("/AllOrdersByCompany/:idCompany", checkJwt, getAllCompanyOrders);
 export default router;
+
+

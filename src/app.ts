@@ -11,13 +11,10 @@ import { corsHandler } from "./middleware/corsHandler";
 import cors from "cors";
 import { loggingHandler } from "./middleware/loggingHandler";
 import { routeNotFound } from "./middleware/routeNotFound";
-import { Result } from "express-validator";
-import axios from "axios";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
 import { UserService } from "./services/user.service";
-import { generateToken } from "./utils/jwt.handle";
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
@@ -85,6 +82,7 @@ passport.deserializeUser(async (id: string, done) => {
     done(error, null);
   }
 });
+
 
 
 app.set("port", PORT);

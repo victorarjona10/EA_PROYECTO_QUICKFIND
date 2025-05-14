@@ -1,5 +1,4 @@
 import { IAdmin, AdminModel } from "../models/admin";
-import { Request, Response } from "express";
 import { verified } from "../utils/bcrypt.handle";
 import { generateToken } from "../utils/jwt.handle";
 import {encrypt} from "../utils/bcrypt.handle";
@@ -18,11 +17,11 @@ export class AdminService {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
 
   } 
+  
 
 
   async getAllAdmins(): Promise<IAdmin[]> {
@@ -49,7 +48,6 @@ export class AdminService {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
   }
@@ -97,7 +95,6 @@ export class AdminService {
     if (user.refreshTokenExpiry && new Date() > user.refreshTokenExpiry) {
         throw new Error("Refresh Token caducado");
     }
-    console.log("Parametros de usuario:", user); // Log para verificar los parámetros del usuario
     // Generar un nuevo Access Token y Refresh Token
     const newAccessToken = generateToken(user.id ,user.email);
     const newRefreshToken = uuidv4();

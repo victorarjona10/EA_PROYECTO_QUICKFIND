@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ICompany, CompanyModel } from "../models/company";
 
 import { Profile } from "passport-google-oauth20";
-import { userInfo } from "os";
+
 
 export class UserService {
 
@@ -44,7 +44,6 @@ export class UserService {
             if (error.code === 11000) {
                 throw new Error("El email ya está registrado");
             }
-            console.log(error);
             throw error;
         }
     }
@@ -78,7 +77,6 @@ export class UserService {
             if (error.code === 11000) {
                 throw new Error("El email ya está registrado");
             }
-            console.log(error);
             throw error;
         }
     }
@@ -142,7 +140,7 @@ export class UserService {
       throw new Error("Refresh Token caducado");
     }
   
-    console.log("Refresh Token válido. Generando nuevos tokens...");
+
   
     // Generar un nuevo Access Token y Refresh Token
     const newAccessToken = generateToken(user.id, user.email);
@@ -155,7 +153,6 @@ export class UserService {
     user.refreshTokenExpiry = newRefreshTokenExpiry;
     await user.save();
   
-    console.log("Nuevo Refresh Token generado y guardado:", newRefreshToken);
   
     return { newAccessToken, newRefreshToken };
   }
@@ -206,13 +203,13 @@ export class UserService {
     if (alreadyFollowed) {
       throw new Error("Ya sigues esta empresa");
     }
+    
       
     user.company_Followed.push({ company_id: new mongoose.Types.ObjectId(companyId) });
-    console.log("Company_Followed:", user);
+
     const company = await CompanyModel.findById(companyId);
     if (company) {
       company.followers++;
-      console.log ("Followers incrementados:", company.followers);
       await company.save();
     }
     return await user.save();

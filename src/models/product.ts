@@ -10,6 +10,7 @@ export interface IProduct {
 }
 
 
+
 const productSchema = new Schema<IProduct>({
     name: { type: String, required: true },
     rating: { type: Number, required: true },

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { IUser } from "../models/user";
 import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
-import { ObjectId } from "mongoose";
 import { RequestExt } from "../middleware/session";
 import { UserModel } from "../models/user";
 import { v4 as uuidv4 } from 'uuid';
@@ -131,12 +130,6 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         }
 
         const user = await userService.getUserById(id);
-        console.log("user", user);
-        console.log("id", id);
-        console.log("userId");
-        console.log("semao");
-        const userId = id;
-        console.log("userId", userId);
         if (!user) {
             res.status(404).json({ message: "Usuario no encontrado" });
             return;
@@ -145,11 +138,11 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
         res.status(200).json(user);
         return;
     } catch (error) {
-      console.log("Error en getUserById:", error)
         res.status(500).json({ message: "Error al obtener el usuario", error: (error as any).message });
         return;
     }
 }
+
 /**
  * @swagger
  * /api/users/name/{name}:
@@ -262,20 +255,16 @@ export async function updateUserById(req: Request, res: Response): Promise<void>
     try {
         const id = req.params.id;
         const user = req.body.user as Partial<IUser>;
-        console.log("user", user);
 
         // Validar que el ID sea válido
         if (!id || id.length !== 24) {
            res.status(400).json({ message: "ID inválido updateUserById" });
-           console.log("ID inválido updateUserById", id);
            return;
           }
 
         // Validar que los datos requeridos estén presentes
         if (!user.email) {
-          console.log(user.email);
            res.status(400).json({ message: "El email es obligatorio" });
-           console.log("El email es obligatorio", user.email);
            return;
           }
 
@@ -404,7 +393,6 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
 export async function refreshAccesToken(req: Request, res: Response): Promise<void> {
   try {
     const { refreshToken } = req.body;
-    console.log("RefreshToken recibido:", refreshToken);
 
     if (!refreshToken) {
       res.status(400).json({ message: "Refresh token es obligatorio" });
@@ -413,7 +401,6 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
 
     const { newAccessToken, newRefreshToken } = await userService.refreshTokenService(refreshToken);
 
-    console.log("Enviando nuevo RefreshToken:", newRefreshToken);
     res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
   } catch (error: any) {
     if (error.message === "Refresh Token inválido") {
@@ -430,8 +417,6 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
 export async function updateAvatar(req: Request, res: Response): Promise<void> {
   try {
     const { email, avatar } = req.body;
-
-   console.log("aavatar\n\n\n", avatar);
     
     
     const updatedAvatar = await userService.updateAvatar(avatar, email);
@@ -461,7 +446,6 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
   try {
     const state = JSON.parse((req.query.state as string) || '{}'); // Recupera el estado
     const origin = state.origin || 'http://localhost:3000'; // Obtén el origen del estado
-    console.log("Origin from state:", origin);
 
     const user = req.user as any;
 
@@ -471,7 +455,6 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
 
     // Guarda el refresh token en la base de datos
     await UserModel.findByIdAndUpdate(user._id, { refreshToken }); // Actualiza el usuario con el refresh token
-    console.log('Refresh token guardado en la base de datos');
 
     // Devuelve un HTML que envía el token y el refresh token al frontend
     res.send(`
@@ -503,8 +486,6 @@ export async function addFollowed (req: Request, res: Response): Promise<void> {
   try {
     const userId = req.params.id; 
     const {companyId}  = req.body;
-    console.log("userId:", userId);
-    console.log("companyId:", companyId);
     const updatedUser = await userService.FollowCompany(userId, companyId);
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -517,8 +498,6 @@ export async function UnfollowCompany (req: Request, res: Response): Promise<voi
   try {
     const userId = req.params.id; 
     const {companyId}  = req.body;
-    console.log("userId:", userId);
-    console.log("companyId:", companyId);
     const updatedUser = await userService.UnfollowCompany(userId, companyId);
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -531,7 +510,6 @@ export async function UnfollowCompany (req: Request, res: Response): Promise<voi
 export async function getFollowedCompanies (req: Request, res: Response): Promise<void> {
   try {
     const userId = req.params.id; 
-    console.log("userId:", userId);
     const followedCompanies = await userService.getFollowedCompanies(userId);
     res.status(200).json(followedCompanies);
   } catch (error) {
@@ -544,7 +522,6 @@ export async function getFollowedCompanies (req: Request, res: Response): Promis
 export async function getAllCompanies (req: Request, res: Response): Promise<void> {
   try {
     const userId = req.params.id; 
-    console.log("userId:", userId);
     const allCompanies = await userService.getCompaniesByOwnerId(userId);
     res.status(200).json(allCompanies);
   } catch (error) {
