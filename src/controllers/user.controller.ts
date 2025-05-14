@@ -550,3 +550,5 @@ export async function getAllCompanies (req: Request, res: Response): Promise<voi
     res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
+c o n s o l e . l o g ( " t e s t " )  
+ 
