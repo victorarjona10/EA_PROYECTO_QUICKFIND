@@ -1,12 +1,27 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
 import {  ProductModel } from "../models/product";
-import { verified } from "../utils/bcrypt.handle";
+import { encrypt, verified } from "../utils/bcrypt.handle";
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
     try {
-      const newCompany = new CompanyModel(company);
+
+      const newCompany = new CompanyModel({
+      ...company,
+      rating: company.rating ?? 0,
+      userRatingsTotal: company.userRatingsTotal ?? 0,
+      products: company.products ?? [],
+      reviews: company.reviews ?? [],
+      wallet: company.wallet ?? 0,
+      followers: company.followers ?? 0,
+      photos: company.photos ?? [],
+      icon: company.icon ?? "https://res.cloudinary.com/dqj8xgq4h/image/upload/v1697060982/CompanyIcon_1_ojzv5c.png"
+    });
+    if (!company.password) {
+      throw new Error("Password is required");
+    }
+    newCompany.password = await encrypt(company.password); // Asegúrate de que company.password no sea undefined
       return newCompany.save();
     } catch (error: any) {
       if (error.code === 11000) {

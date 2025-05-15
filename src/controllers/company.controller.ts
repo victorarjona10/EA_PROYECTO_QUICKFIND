@@ -17,20 +17,25 @@ export async function postCompany(req: Request, res: Response): Promise<void> {
       res
         .status(400)
         .json({ message: "Nombre, email y contraseña son obligatorios" });
+      return;
     }
     if (!company.ownerId) {
       res.status(400).json({ message: "El id del propietario es obligatorio" });
+      return;
     }
-
+    
     const newCompany = await companyService.postCompany(company);
-    res.status(201).json(newCompany);
+    res.status(200).json(newCompany);
+    return;
   } catch (error: any) {
     if (error.code === 11000) {
       res.status(403).json({ message: "El email ya está registrado" });
+      return;
     } else {
       res
         .status(500)
         .json({ message: "Error al crear la empresa", error: error.message });
+      return;
     }
   }
 }

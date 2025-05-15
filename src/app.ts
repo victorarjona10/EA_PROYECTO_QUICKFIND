@@ -44,6 +44,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.disable('etag');
 
 // Google OAuth 策略
 passport.use(
