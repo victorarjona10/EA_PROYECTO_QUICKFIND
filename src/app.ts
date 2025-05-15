@@ -29,7 +29,13 @@ console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 console.log("GOOGLE_REDIRECT_URI:", process.env.GOOGLE_REDIRECT_URI);
 // Removed duplicate import of axios
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 40000;
+const HOST_IP = process.env.HOST_IP || "0.0.0.0";
+const ANGULAR_PORT = process.env.ANGULAR_PORT || "4200";
+const REACT_PORT = process.env.REACT_PORT || "3000";
+const ANGULAR_DOMAIN = process.env.ANGULAR_DOMAIN || "localhost";
+const REACT_DOMAIN = process.env.REACT_DOMAIN || "localhost";
+
 
 // ================= Google OAuth 配置 =================
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -110,15 +116,15 @@ app.get("/api/auth/google/callback/test", (req: Request, res: Response) => {
 });
 
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:3000'],
+  origin: [`http://${ANGULAR_DOMAIN}:*`, `http://${REACT_DOMAIN}:*`, `http://147.83.7.208:80`, `http://ea6.upc.edu`], //quitar puertos y acerptar dominiso *
   credentials: true
 }));
 
 app.use(routeNotFound);//Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-app.listen(PORT, () => {
-  console.log(`Server running at  http://localhost:${PORT}`);
-  console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
+app.listen(PORT,HOST_IP,() => {
+  console.log(`Server running at new try  http://${HOST_IP}:${PORT}`);
+  console.log(`Swagger running at http://${HOST_IP}:${PORT}/api-docs/`);
 });
 
 export default app;
