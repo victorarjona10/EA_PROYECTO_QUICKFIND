@@ -11,7 +11,10 @@ import {
   deleteCompanyById,
   updateCompanyById,
   getCompanyWithProductsById,
-  loginCompany
+  getCompanyByName,
+  getCompaniesByProductName,
+  loginCompany,
+
 } from "../controllers/company.controller";
 import { checkJwt } from "../middleware/session";
 
@@ -29,6 +32,7 @@ router.put("/rate/:id", checkJwt, RateCompany);
 router.post("/review/:id", checkJwt, reviewCompany);
 router.get("/reviews/:id", checkJwt, getCompanyReviews);
 router.put("/:id/addProduct", checkJwt, addProductToCompany);
+router.get("/search/:search", getCompanyByName);
+router.get('/searchProduct/:name', getCompaniesByProductName);
 router.post("/login", loginCompany);
-
 export default router;

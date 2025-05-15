@@ -195,6 +195,41 @@ export class CompanyService {
     }
   }
 
+
+
+  async getCompanyByName(text: string): Promise<ICompany[]> {
+    try {
+      // Buscar compañías que coincidan con el texto
+      const matchedCompanies = await CompanyModel.find({ $text: { $search: text } }).exec();
+      return matchedCompanies as ICompany[];
+    } catch (error) {
+      console.error("Error al buscar compañías:", error);
+      throw new Error("No se pudieron buscar las compañías");
+    }
+  }
+
+  async getCompaniesByProductName(productName: string): Promise<ICompany[]> {
+  try {
+    // Buscar productos que coincidan con el nombre proporcionado
+    const matchedProducts = await ProductModel.find({
+      $text: { $search: productName },
+    }).exec();
+
+    // Extraer los IDs de las empresas asociadas a los productos encontrados
+    const companyIds = matchedProducts.map((product) => product.companyId);
+
+    // Eliminar duplicados de los IDs de las empresas
+    const uniqueCompanyIds = [...new Set(companyIds)];
+
+    // Buscar las empresas por sus IDs
+    const companies = await CompanyModel.find({ _id: { $in: uniqueCompanyIds } }).exec();
+
+    return companies;
+  } catch (error) {
+    console.error("Error al buscar empresas por nombre de producto:", error);
+    throw new Error("No se pudieron buscar las empresas");
+  }
+}
   
     async loginCompany(email: string, password: string): Promise<{ company: ICompany }> {
         const company = await CompanyModel.findOne({ email });
@@ -212,6 +247,7 @@ export class CompanyService {
         //return { token, refreshToken };
       }
     
+
 }
 
 
