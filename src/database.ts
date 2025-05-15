@@ -2,7 +2,6 @@
 import { connect, connection } from 'mongoose'
 import { CompanyModel } from './models/company';
 import { ProductModel } from './models/product';
-import { connect } from 'mongoose'
 
                 //mongodb://localhost:27017/proyecto
                 //mongodb://mongodb:27017/Ops

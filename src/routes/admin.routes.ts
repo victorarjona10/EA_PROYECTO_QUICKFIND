@@ -15,7 +15,7 @@ const router = Router();
 
 
 
-router.post("/", checkJwt,  postAdmin);
+router.post("/",  postAdmin);
 router.get("/", checkJwt, getAllAdmins);
 router.get("/:id", checkJwt, getAdminById);
 router.put("/:id", checkJwt, updateAdminById);

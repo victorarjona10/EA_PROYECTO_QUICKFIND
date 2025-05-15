@@ -7,6 +7,7 @@ export interface IProduct {
   rating: number;
   description: string;
   price: number;
+  
 }
 
 

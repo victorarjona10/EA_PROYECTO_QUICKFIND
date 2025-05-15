@@ -12,7 +12,7 @@ import passport from 'passport';
 router.get( "/ActiveUsers/", checkJwt, getAllActiveUsers);
 router.get( "/usersByFiltration/", checkJwt,  getUsersByFiltration);
 router.get( "/", checkJwt,  getAllUsers);
-router.post( "/", checkJwt,  postUser );
+router.post( "/",  postUser );
 router.get('/:id', checkJwt,  getUserById);
 router.get('/name/:name', checkJwt,  getUserByName);
 router.get('/email/:email', checkJwt,  getUserByEmail);
