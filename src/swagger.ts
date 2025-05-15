@@ -62,6 +62,5 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 export function setupSwagger(app: Application): void {
-    console.log('Setting up Swagger');
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }

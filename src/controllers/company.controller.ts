@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
 import { ICompany } from "../models/company";
 import { CompanyService } from "../services/company.service";
-import { ProductModel } from "../models/product";
 import axios from "axios";
-import exp from "constants";
+
 import { IReview } from "../models/review";
 
 const companyService = new CompanyService();
 
 
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+
 
 export async function postCompany(req: Request, res: Response): Promise<void> {
   try {
@@ -18,20 +19,25 @@ export async function postCompany(req: Request, res: Response): Promise<void> {
       res
         .status(400)
         .json({ message: "Nombre, email y contraseña son obligatorios" });
+      return;
     }
     if (!company.ownerId) {
       res.status(400).json({ message: "El id del propietario es obligatorio" });
+      return;
     }
-
+    
     const newCompany = await companyService.postCompany(company);
-    res.status(201).json(newCompany);
+    res.status(200).json(newCompany);
+    return;
   } catch (error: any) {
     if (error.code === 11000) {
       res.status(403).json({ message: "El email ya está registrado" });
+      return;
     } else {
       res
         .status(500)
         .json({ message: "Error al crear la empresa", error: error.message });
+      return;
     }
   }
 }
@@ -325,6 +331,7 @@ export async function addProductToCompany(
   }
 }
 
+
 export async function getCompanyByName(req: Request, res: Response): Promise<void> {
   try {
     const searchText = req.params.search as string;
@@ -358,3 +365,26 @@ export async function getCompaniesByProductName(req: Request, res: Response): Pr
     res.status(500).json({ message: "Error al buscar empresas por nombre de producto" });
   }
 }
+
+ export async function loginCompany(req: Request, res: Response): Promise<void> {
+        try {
+            const { email, password } = req.body;
+            if (!email || !password) {
+                res.status(400).json({ message: "Email y contraseña son obligatorios" });
+                return;
+            }
+            const company = await companyService.loginCompany(email, password);
+            if (!company) {
+                res.status(401).json({ message: "Email o contraseña incorrectos" });
+                return;
+            }
+            res.status(200).json(company);
+        } catch (error) {
+            res.status(500).json({ message: "Error al iniciar sesión", error });
+        }
+    }
+
+
+
+    
+

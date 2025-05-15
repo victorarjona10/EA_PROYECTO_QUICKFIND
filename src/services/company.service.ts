@@ -1,17 +1,32 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
-import { IProduct, ProductModel } from "../models/product";
+import {  ProductModel } from "../models/product";
+import { encrypt, verified } from "../utils/bcrypt.handle";
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
     try {
-      const newCompany = new CompanyModel(company);
+
+      const newCompany = new CompanyModel({
+      ...company,
+      rating: company.rating ?? 0,
+      userRatingsTotal: company.userRatingsTotal ?? 0,
+      products: company.products ?? [],
+      reviews: company.reviews ?? [],
+      wallet: company.wallet ?? 0,
+      followers: company.followers ?? 0,
+      photos: company.photos ?? [],
+      icon: company.icon ?? "https://res.cloudinary.com/dqj8xgq4h/image/upload/v1697060982/CompanyIcon_1_ojzv5c.png"
+    });
+    if (!company.password) {
+      throw new Error("Password is required");
+    }
+    newCompany.password = await encrypt(company.password); // Asegúrate de que company.password no sea undefined
       return newCompany.save();
     } catch (error: any) {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
   }
@@ -45,7 +60,6 @@ export class CompanyService {
       if (error.code === 11000) {
         throw new Error("El email ya está registrado");
       }
-      console.log(error);
       throw error;
     }
   }
@@ -98,6 +112,7 @@ export class CompanyService {
       if (!updatedReview) {
         throw new Error("Error al actualizar la reseña");
       }
+      
 
       // Actualiza la calificación de la empresa
       const updatedRating = parseFloat(
@@ -136,14 +151,12 @@ export class CompanyService {
   }
 
   async getCompanyReviews(companyId: string): Promise<IReview[]> {
-    console.log("Company ID:", companyId);
     if (!companyId || companyId.length !== 24) {
       throw new Error("ID inválido");
     }
-    const reviews = await ReviewModel.find({ company_id: companyId })
+    await ReviewModel.find({ company_id: companyId })
       .populate("user_id")
       .exec();
-    console.log("Reviews:", reviews);
     return ReviewModel.find({ company_id: companyId })
       .populate("user_id")
       .exec();
@@ -183,6 +196,7 @@ export class CompanyService {
   }
 
 
+
   async getCompanyByName(text: string): Promise<ICompany[]> {
     try {
       // Buscar compañías que coincidan con el texto
@@ -216,4 +230,25 @@ export class CompanyService {
     throw new Error("No se pudieron buscar las empresas");
   }
 }
+  
+    async loginCompany(email: string, password: string): Promise<{ company: ICompany }> {
+        const company = await CompanyModel.findOne({ email });
+        if (!company) {
+          throw new Error("Email o contraseña incorrectos");
+        }
+    
+        // Comparación directa de contraseñas
+        const isPasswordValid = await verified(password, company.password); 
+        if (!isPasswordValid) {
+          throw new Error("Email o contraseña incorrectos");
+        }
+    
+        return {  company: company.toObject() as ICompany};
+        //return { token, refreshToken };
+      }
+    
+
 }
+
+
+

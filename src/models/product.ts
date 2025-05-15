@@ -10,6 +10,7 @@ export interface IProduct {
 }
 
 
+
 const productSchema = new Schema<IProduct>({
     companyId: { type: Schema.Types.ObjectId, ref: "Company" , required: true},
     name: { type: String, required: true },

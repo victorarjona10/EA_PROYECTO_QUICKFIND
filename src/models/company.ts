@@ -23,6 +23,7 @@ export interface ICompany {
 }
 
 
+
 const companySchema = new Schema<ICompany>({
   ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },

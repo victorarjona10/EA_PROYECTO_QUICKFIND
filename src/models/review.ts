@@ -9,6 +9,7 @@ export interface IReview {
   date: Date;
 }
 
+
 const reviewSchema = new Schema<IReview>({
     user_id: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     company_id: {type: Schema.Types.ObjectId, ref: 'Company', required: true},

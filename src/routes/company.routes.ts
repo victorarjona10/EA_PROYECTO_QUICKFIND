@@ -12,9 +12,12 @@ import {
   updateCompanyById,
   getCompanyWithProductsById,
   getCompanyByName,
-  getCompaniesByProductName
+  getCompaniesByProductName,
+  loginCompany,
+
 } from "../controllers/company.controller";
 import { checkJwt } from "../middleware/session";
+
 
 const router = Router();
 router.get("/companies", checkJwt, getCompanies);
@@ -31,6 +34,5 @@ router.get("/reviews/:id", checkJwt, getCompanyReviews);
 router.put("/:id/addProduct", checkJwt, addProductToCompany);
 router.get("/search/:search", getCompanyByName);
 router.get('/searchProduct/:name', getCompaniesByProductName);
-
-
+router.post("/login", loginCompany);
 export default router;

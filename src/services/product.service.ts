@@ -23,5 +23,4 @@ export class ProductService {
         return ProductModel.findByIdAndDelete(id);
     }
 
-
 }
