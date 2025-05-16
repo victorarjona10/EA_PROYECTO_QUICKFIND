@@ -82,6 +82,7 @@ export async function updateCompanyById(
     const id = req.params.id;
     if (!id || id.length !== 24) {
       res.status(400).json({ message: "ID inválido" });
+      return;
     }
     const company = req.body as ICompany;
     const updatedCompany = await companyService.updateCompanyById(id, company);
@@ -90,10 +91,12 @@ export async function updateCompanyById(
       return;
     }
     res.status(200).json(updatedCompany);
+    return;
   } catch (error: any) {
     if (error.message === "El email ya está registrado") {
       // Enviar una respuesta clara para el error de email duplicado
       res.status(403).json({ message: error.message });
+      return;
     } else {
       // Manejo genérico de errores
       res
@@ -366,23 +369,87 @@ export async function getCompaniesByProductName(req: Request, res: Response): Pr
   }
 }
 
- export async function loginCompany(req: Request, res: Response): Promise<void> {
-        try {
-            const { email, password } = req.body;
-            if (!email || !password) {
-                res.status(400).json({ message: "Email y contraseña son obligatorios" });
-                return;
-            }
-            const company = await companyService.loginCompany(email, password);
-            if (!company) {
-                res.status(401).json({ message: "Email o contraseña incorrectos" });
-                return;
-            }
-            res.status(200).json(company);
-        } catch (error) {
-            res.status(500).json({ message: "Error al iniciar sesión", error });
-        }
+export async function loginCompany(req: Request, res: Response): Promise<void> {
+      try {
+          const { email, password } = req.body;
+          if (!email || !password) {
+              res.status(400).json({ message: "Email y contraseña son obligatorios" });
+              return;
+          }
+          const company = await companyService.loginCompany(email, password);
+          if (!company) {
+              res.status(401).json({ message: "Email o contraseña incorrectos" });
+              return;
+          }
+          res.status(200).json(company);
+      } catch (error) {
+          res.status(500).json({ message: "Error al iniciar sesión", error });
+      }
+}
+
+export async function updateCompanyAvatar(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, avatar } = req.body;
+  
+    await companyService.updateAvatar(avatar, email);
+    res.status(200).json({message: "Avatar actualizado correctamente"});
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Error updating avatar", error });
+    return;
+  }
+    
+}
+
+export async function getPendingOrdersByCompanyId(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
     }
+    const orders = await companyService.getPendingOrdersByCompanyId(id);
+    if (!orders) {
+      res.status(404).json({ message: "Pedidos no encontrados" });
+      return;
+    }
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting orders", error });
+  }
+}
+
+export async function putCompanyPhoto(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const { photo } = req.body;
+    const updatedAvatar = await companyService.putCompanyPhoto(id, photo);
+    res.status(200).json(updatedAvatar);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating avatar", error });
+  }
+}
+
+export async function updateCompanyPhotos(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const { photos } = req.body;
+    const updatedAvatar = await companyService.updateCompanyPhotos(id, photos);
+    res.status(200).json(updatedAvatar);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating avatar", error });
+  }
+}
+
+
 
 
 

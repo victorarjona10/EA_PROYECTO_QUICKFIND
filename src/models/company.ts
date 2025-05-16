@@ -20,6 +20,7 @@ export interface ICompany {
   photos?: string[];
   followers: number;
   reviews?: ObjectId[];
+  pendingOrders?: ObjectId[];
 }
 
 
@@ -47,6 +48,7 @@ const companySchema = new Schema<ICompany>({
     photos: [{type: String, required: false}],
     followers: { type: Number, required: true, default: 0 },
     reviews: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
+    pendingOrders: [{ type: Schema.Types.ObjectId, ref: "Order", required: false }],
   });
   
   export const CompanyModel = model("Company", companySchema);

@@ -421,8 +421,10 @@ export async function updateAvatar(req: Request, res: Response): Promise<void> {
     
     const updatedAvatar = await userService.updateAvatar(avatar, email);
     res.status(200).json(updatedAvatar);
+    return;
   } catch (error) {
     res.status(500).json({ message: "Error refreshing access token", error });
+    return;
   }
   
 }

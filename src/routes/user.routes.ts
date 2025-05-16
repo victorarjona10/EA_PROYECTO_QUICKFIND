@@ -18,7 +18,7 @@ router.get('/name/:name', checkJwt,  getUserByName);
 router.get('/email/:email', checkJwt,  getUserByEmail);
 router.get('/followedCompanies/:id', checkJwt,  getFollowedCompanies);
 router.get('/companies/:id', checkJwt,  getAllCompanies);
-router.put("/uptdateAvatar", checkJwt, updateAvatar);
+router.put("/updateAvatar", checkJwt, updateAvatar);
 
 router.put('/:id', checkJwt,  updateUserById);
 router.put('/InactivateFlag/:id', checkJwt,  InactivateUserById);

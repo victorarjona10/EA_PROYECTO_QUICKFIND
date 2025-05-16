@@ -54,6 +54,10 @@ export class PedidosService {
         }
     }
 
+    async updateOrderStatus(id: string, status: string) {
+        return await OrderModel.findByIdAndUpdate(id, { status }, { new: true }).populate('user_id').populate('products.product_id').exec();
+    }
+
 
 async deletePedidoById(id: string) {
 

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { IOrder } from "../models/order";
 import { PedidosService } from "../services/order.service";
+import { CompanyService } from "../services/company.service";
 
 const pedidosService = new PedidosService();
+const companyService = new CompanyService();
 
 /**
  * @swagger
@@ -34,6 +36,7 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
     }
 
     const newPedido = await pedidosService.postPedido(pedido);
+    await companyService.addPendingOrderToCompany(pedido.company_id.toString(), newPedido._id.toString());
     res.status(200).json(newPedido);
   } catch (error:any) {
     res.status(500).json({ message: "Error creating order", error: error.message });
@@ -157,10 +160,11 @@ export async function updatePedidoById(
 ): Promise<void> {
   try {
     const id = req.params.id;
+  
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+    }
 
-        if (!id || id.length !== 24) {
-            res.status(400).json({ message: "ID inválido" });
-        }
     const updatedPedido = await pedidosService.updatePedidoById(req.params.id, req.body as IOrder);
     if (!updatedPedido) {
       res.status(404).json({ message: "Pedido no encontrado" });
@@ -170,6 +174,29 @@ export async function updatePedidoById(
     res.status(500).json({ message: "Error updating order", error });
   }
 }
+
+export async function updateOrderStatus(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+    }
+
+    const updatedPedido = await pedidosService.updateOrderStatus(id, status);
+    if (!updatedPedido) {
+      res.status(404).json({ message: "Pedido no encontrado" });
+    }
+    res.status(200).json(updatedPedido);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating order", error });
+  }
+}
+
 
 /**
  * @swagger

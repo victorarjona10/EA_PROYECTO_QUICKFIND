@@ -1,4 +1,4 @@
-import { compare } from 'bcryptjs';
+
 import { IProduct, ProductModel } from '../models/product';
 
 export class ProductService {
@@ -6,6 +6,8 @@ export class ProductService {
         const newProduct = new ProductModel(product);
         return newProduct.save();
     }
+
+    
 
     async getAllProducts(): Promise<IProduct[]> {
         return ProductModel.find();

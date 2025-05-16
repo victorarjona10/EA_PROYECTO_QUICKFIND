@@ -2,6 +2,7 @@ import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
 import {  ProductModel } from "../models/product";
 import { encrypt, verified } from "../utils/bcrypt.handle";
+import { IOrder, OrderModel } from "../models/order";
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
@@ -91,6 +92,9 @@ export class CompanyService {
         "Faltan datos obligatorios para crear o actualizar la reseña"
       );
     }
+    if (!review._id) {
+        delete review._id;
+    }
 
     const company = await CompanyModel.findById(review.company_id);
     if (!company) {
@@ -104,6 +108,8 @@ export class CompanyService {
     });
     if (existingReview) {
       // Actualiza la reseña existente
+      
+
       const updatedReview = await ReviewModel.findByIdAndUpdate(
         existingReview._id,
         review,
@@ -134,8 +140,9 @@ export class CompanyService {
       return updatedReview;
     } else {
       // Crea una nueva reseña
+      
       const newReview = new ReviewModel(review);
-
+      
       company.reviews?.push(newReview._id);
       company.rating = parseFloat(
         (
@@ -246,9 +253,92 @@ export class CompanyService {
         return {  company: company.toObject() as ICompany};
         //return { token, refreshToken };
       }
-    
+  
+      async updateAvatar( avatar:string, email: string): Promise<ICompany | null>{
+          return await CompanyModel.findOneAndUpdate({email:email}, { icon: avatar }, { new: true });
+        }
+  
+  async addPendingOrderToCompany(
+    companyId: string,
+    orderId: string
+  ): Promise<ICompany | null> {
+    try {
+      const company = await CompanyModel.findById(companyId);
+      if (!company) {
+        throw new Error("Company not found");
+      }
+      if (!company.pendingOrders) {
+        company.pendingOrders = [];
+      }
+      const order = await OrderModel.findById(orderId);
+      if (!order) {
+        throw new Error("Order not found");
+      }
+      company.pendingOrders.push(order._id);
+      return await company.save();
+    } catch (error) {
+      console.error("Error al añadir pedido pendiente a la empresa:", error);
+      throw error;
+    }
+  }
 
+  async getPendingOrdersByCompanyId(
+    companyId: string
+  ): Promise<IOrder[] | null> {
+    try {
+      const company = await CompanyModel.findById(companyId).populate("pendingOrders");
+      if (!company) {
+        throw new Error("Company not found");
+      }
+      // Ensure pendingOrders is populated with full Order documents
+      return (company.pendingOrders ?? []) as unknown as IOrder[];
+    } catch (error) {
+      console.error("Error al obtener pedidos pendientes de la empresa:", error);
+      throw error;
+    }
+  }
+
+
+  async putCompanyPhoto(
+    companyId: string,
+    photo: string
+  ): Promise<ICompany | null> {
+    try {
+      const company = await CompanyModel.findById(companyId);
+      if (!company) {
+        throw new Error("Company not found");
+      }
+      if (!company.photos) {
+        company.photos = [];
+      }
+      company.photos.push(photo);
+      return await company.save();
+    } catch (error) {
+      console.error("Error al añadir foto a la empresa:", error);
+      throw error;
+    }
+  }
+
+  async updateCompanyPhotos(
+    companyId: string,
+    photos: string[]
+  ): Promise<ICompany | null> {
+    try {
+      const company = await CompanyModel.findById(companyId);
+      if (!company) {
+        throw new Error("Company not found");
+      }
+      company.photos = photos;
+      return await company.save();
+    } catch (error) {
+      console.error("Error al actualizar fotos de la empresa:", error);
+      throw error;
+    }
+  }
 }
+
+
+
 
 
 
