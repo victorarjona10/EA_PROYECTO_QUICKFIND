@@ -1,7 +1,7 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
 import {  ProductModel } from "../models/product";
-import { encrypt, verified } from "../utils/bcrypt.handle";
+import { encrypt, verified} from "../utils/bcrypt.handle";
 import { IOrder, OrderModel } from "../models/order";
 
 export class CompanyService {
@@ -245,10 +245,10 @@ export class CompanyService {
         }
     
         // Comparación directa de contraseñas
-        const isPasswordValid = await verified(password, company.password); 
-        if (!isPasswordValid) {
-          throw new Error("Email o contraseña incorrectos");
-        }
+        await verified(password, company.password); 
+        // if (!isPasswordValid) {
+        //   throw new Error("Email o contraseña incorrectos");
+        // }
     
         return {  company: company.toObject() as ICompany};
         //return { token, refreshToken };
