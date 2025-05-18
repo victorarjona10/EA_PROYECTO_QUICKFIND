@@ -7,7 +7,7 @@ import { ProductModel } from './models/product';
                 //mongodb://mongodb:27017/Ops
                 //mongodb+srv://victorarjona:RkJ7CyZ46HzsvC3b@quickfindeaproject.mr2tj.mongodb.net/?retryWrites=true&w=majority&appName=QuickFindEAProject
 
-const mongoURI = 'mongodb+srv://victorarjona:RkJ7CyZ46HzsvC3b@quickfindeaproject.mr2tj.mongodb.net/?retryWrites=true&w=majority&appName=QuickFindEAProject';  
+const mongoURI = 'mongodb://mongodb:27017/Ops';  
 
 export async function startConnection() {
     try {

@@ -1,8 +1,8 @@
 services:
   miapi:
-    image: victorarjona10/api_13_5:latest
+    image: victorarjona10/api_quickfind_ea:latest
     ports:
-      - "40000:4000"
+      - "40000:40000"
     depends_on:
       - mongodb
     networks:
