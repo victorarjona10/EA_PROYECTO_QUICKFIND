@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { IOrder } from "../models/order";
 import { PedidosService } from "../services/order.service";
 import { CompanyService } from "../services/company.service";
-
+import { NotificationService } from "../services/notification.service";
+import { notificationService } from "../services/notification.service";
 const pedidosService = new PedidosService();
 const companyService = new CompanyService();
 
@@ -32,17 +33,25 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
   try {
     const pedido = req.body as IOrder;
     if (!pedido.user_id || !pedido.products || pedido.products.length === 0) {
-      res.status(400).json({ message: "User ID, Product ID and quantity are required" });
+      res
+        .status(400)
+        .json({ message: "User ID, Product ID and quantity are required" });
     }
 
     const newPedido = await pedidosService.postPedido(pedido);
-    await companyService.addPendingOrderToCompany(pedido.company_id.toString(), newPedido._id.toString());
+    await companyService.addPendingOrderToCompany(
+      pedido.company_id.toString(),
+      newPedido._id.toString()
+    );
+    // Enviar notificación en tiempo real
+    await notificationService.sendNewOrderNotification(newPedido);
     res.status(200).json(newPedido);
-  } catch (error:any) {
-    res.status(500).json({ message: "Error creating order", error: error.message });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error creating order", error: error.message });
   }
 }
-
 
 /**
  * @swagger
@@ -82,7 +91,6 @@ export async function getPedidosByUserId(
   }
 }
 
-
 /**
  * @swagger
  * /api/pedidos/{id}:
@@ -114,11 +122,11 @@ export async function getPedidoById(
     const id = req.params.id;
     if (!id || id.length !== 24) {
       res.status(400).json({ message: "ID inválido" });
-  }
+    }
     const pedido = await pedidosService.getPedidoById(id);
     if (!pedido) {
       res.status(404).json({ message: "Pedido no encontrado" });
-  }
+    }
     res.status(200).json(pedido);
   } catch (error) {
     res.status(500).json({ message: "Error getting order", error });
@@ -160,15 +168,18 @@ export async function updatePedidoById(
 ): Promise<void> {
   try {
     const id = req.params.id;
-  
+
     if (!id || id.length !== 24) {
       res.status(400).json({ message: "ID inválido" });
     }
 
-    const updatedPedido = await pedidosService.updatePedidoById(req.params.id, req.body as IOrder);
+    const updatedPedido = await pedidosService.updatePedidoById(
+      req.params.id,
+      req.body as IOrder
+    );
     if (!updatedPedido) {
       res.status(404).json({ message: "Pedido no encontrado" });
-  }
+    }
     res.status(200).json(updatedPedido);
   } catch (error) {
     res.status(500).json({ message: "Error updating order", error });
@@ -196,7 +207,6 @@ export async function updateOrderStatus(
     res.status(500).json({ message: "Error updating order", error });
   }
 }
-
 
 /**
  * @swagger
@@ -236,17 +246,22 @@ export async function deletePedidoById(
       res.status(404).json({ message: "Pedido no encontrado" });
     }
     res.status(200).json(deletedPedido);
-  } catch (error:any) {
-    res.status(500).json({ message: "Error deleting order", error: error.message });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error deleting order", error: error.message });
   }
 }
 
 export async function deleteProductFromOrder(
   req: Request,
   res: Response
-): Promise<void>  {
-  try{
-    const deleteProduct = await pedidosService.deleteProductFromOrder(req.params.orderId, req.params.productId);
+): Promise<void> {
+  try {
+    const deleteProduct = await pedidosService.deleteProductFromOrder(
+      req.params.orderId,
+      req.params.productId
+    );
     res.status(200).json(deleteProduct);
   } catch (error) {
     res.status(400).json({ message: "Error updating order", error });
@@ -265,5 +280,3 @@ export async function getAllCompanyOrders(
     res.status(500).json({ message: "Error getting orders", error });
   }
 }
-
-

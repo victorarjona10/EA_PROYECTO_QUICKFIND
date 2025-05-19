@@ -16,11 +16,21 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
 import { UserService } from "./services/user.service";
 import dotenv from "dotenv";
+import notificationRoutes from "./routes/notification.routes";
+import { notificationService } from "./services/notification.service";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { initializeSocketIO } from "./socket";
+
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
 const app = express();
-app.use('/public', express.static(path.join(__dirname, '../public')));
-
+const server = http.createServer(app);
+// Inicializamos Socket.IO en el servidor
+const io = initializeSocketIO(server);
+notificationService.initializeListeners();
+export { io };
+app.use("/public", express.static(path.join(__dirname, "../public")));
 
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
@@ -44,7 +54,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.disable('etag');
+app.disable("etag");
 
 // Google OAuth 策略
 passport.use(
@@ -53,13 +63,12 @@ passport.use(
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: GOOGLE_REDIRECT_URI,
-      
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         const userService = new UserService();
         const user = await userService.findOrCreateUserFromGoogle(profile);
-        
+
         done(null, user);
       } catch (error) {
         done(error);
@@ -84,12 +93,10 @@ passport.deserializeUser(async (id: string, done) => {
   }
 });
 
-
-
 app.set("port", PORT);
 app.use(corsHandler); //Middleware para gestionar las peticiones permitidas
 app.use(loggingHandler); //Middleware para registrar las peticiones por consola
-app.use(express.json());//Middleware para convertir JSON a objetos de JS a traves de req.body
+app.use(express.json()); //Middleware para convertir JSON a objetos de JS a traves de req.body
 
 app.use(express.json() as RequestHandler);
 
@@ -103,19 +110,23 @@ app.use("/api/company", companyRoutes);
 app.use("/api/orders", pedidosRoutes);
 app.use("/api/admins", adminRoutes);
 
+app.use("/api/notifications", notificationRoutes);
+
 // ================= Google Test登录回调测试路由 =================
 app.get("/api/auth/google/callback/test", (req: Request, res: Response) => {
   res.send("Google OAuth Succcess! 回调成功！请检查控制台日志。");
 });
 
-app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:3000'],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:4200", "http://localhost:3000"],
+    credentials: true,
+  })
+);
 
-app.use(routeNotFound);//Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
+app.use(routeNotFound); //Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running at  http://localhost:${PORT}`);
   console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
 });
