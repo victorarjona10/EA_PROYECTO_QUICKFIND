@@ -252,6 +252,84 @@ export class UserService {
     });
 }
 
+
+
+
+
+
+
+
+//------------------------------Funciones de seguimiento de usuarios------------------------------
+
+
+
+async FollowUser(userId: string, userToFollowId: string): Promise<IUser | null> {
+  const user = await UserModel.findById(userId);
+  if (!user) { 
+    throw new Error("Usuario no encontrado");
+  }
+  const alreadyFollowed = user.user_Followed.some(
+    (followedUser) => followedUser.user_id.toString() === userToFollowId
+  );
+  if (alreadyFollowed) {
+    throw new Error("Ya sigues a este usuario");
+  }
+  user.user_Followed.push({ user_id: new mongoose.Types.ObjectId(userToFollowId) });
+  user.following++;
+  const followedUser = await UserModel.findById(userToFollowId);
+  if (followedUser) {
+    followedUser.followers++;
+    await followedUser.save();
+  }
+  return await user.save();
+}
+
+async UnfollowUser(userId: string, userToUnfollowId: string): Promise<IUser | null> {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+  const userIndex = user.user_Followed.findIndex(
+    (followedUser) => followedUser.user_id.toString() === userToUnfollowId
+  );
+  if (userIndex === -1) {
+    throw new Error("No sigues a este usuario");
+  }
+  user.user_Followed.splice(userIndex, 1);
+  user.following--;
+  const unfollowedUser = await UserModel.findById(userToUnfollowId);
+  if (unfollowedUser) {
+    unfollowedUser.followers--;
+    await unfollowedUser.save();
+  }
+  return await user.save();
+}
+
+async getFollowedUsers(userId: string): Promise<IUser[]> {
+  const user = await UserModel.findById(userId).populate("user_Followed.user_id");
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+  return user.user_Followed.map((followedUser) => {
+    if (followedUser.user_id instanceof mongoose.Types.ObjectId) {
+      throw new Error("User data is not populated");
+    }
+    return followedUser.user_id as IUser;
+  });
+}
+
+
+async getFollowingUsers(userId: string): Promise<IUser[]> {
+
+    // Busca todos los usuarios que tienen tu userId en su array user_Followed
+    const followers = await UserModel.find({ "user_Followed.user_id": userId }).populate("user_Followed.user_id");
+    return followers;
+  
+}
+
+//-------------------------------Fin de funciones de seguimiento de usuarios------------------------------
+
+
 async getCompaniesByOwnerId(userId: string): Promise<ICompany[]> {
   try {
     // Buscar todas las compañías cuyo ownerId coincida con el userId proporcionado

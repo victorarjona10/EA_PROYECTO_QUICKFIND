@@ -16,7 +16,12 @@ export interface IUser {
   googleId?: string; // Optional field for Google ID
   company_Followed: {
     company_id: mongoose.Types.ObjectId;
-  }[];
+  }[],
+  user_Followed: {
+    user_id: mongoose.Types.ObjectId;
+  }[],
+  followers: number;
+  following: number;
 }
 
 
@@ -46,6 +51,17 @@ const userSchema = new Schema<IUser>({
       },
     },
   ],
+  user_Followed: [
+    {
+      user_id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: false
+      },
+    },
+  ],
+  followers: { type: Number, default: 0 },
+  following: { type: Number, default: 0 }
 
 });
 

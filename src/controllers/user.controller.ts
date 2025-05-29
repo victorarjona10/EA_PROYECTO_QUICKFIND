@@ -520,6 +520,62 @@ export async function getFollowedCompanies (req: Request, res: Response): Promis
   }
 }
 
+
+
+
+
+
+
+
+
+export async function FollowUser (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const {currentUserId}  = req.body;
+    const updatedUser = await userService.FollowUser(currentUserId, userId);
+    res.status(200).json(updatedUser);
+    
+  } catch (error) {
+    console.error("Error in FollowUser:", error);
+    res.status(500).json({ message: "Error following user", error });
+  }
+}
+
+export async function UnfollowUser (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const {currentUserId}  = req.body;
+    const updatedUser = await userService.UnfollowUser(currentUserId, userId);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in UnfollowUser:", error);
+    res.status(500).json({ message: "Error unfollowing user", error });
+  }
+}
+
+export async function getFollowedUsers (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const followedUsers = await userService.getFollowedUsers(userId);
+    res.status(200).json(followedUsers);
+  }
+  catch (error) {
+      console.error("Error in getFollowedUsers:", error);
+      res.status(500).json({ message: "Error getting followed users", error });
+    }
+}
+
+export async function getFollowingUsers (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const followingUsers = await userService.getFollowingUsers(userId);
+    res.status(200).json(followingUsers);
+  } catch (error) {
+    console.error("Error in getFollowingUsers:", error);
+    res.status(500).json({ message: "Error getting following users", error });
+  }
+}
+
 //funcion obtener todas las compañias de un usuario
 export async function getAllCompanies (req: Request, res: Response): Promise<void> {
   try {
