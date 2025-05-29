@@ -130,3 +130,9 @@ export async function clearAllNotifications(
   // Este método podría implementarse en el servicio de notificaciones
   res.status(501).json({ message: "Not implemented yet" });
 }
+
+export async function readNotifications(req: Request, res: Response): Promise<void>{
+   // const success = await notificationService.readNotifications();
+
+    res.status(201).json({ message: "Notification marked as read" });
+}

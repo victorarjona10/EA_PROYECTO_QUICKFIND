@@ -241,6 +241,20 @@ export class NotificationService {
       return 0;
     }
   }
+
+async readNotifications(userId: string): Promise<void> {
+  try {
+    await NotificationModel.updateMany(
+      { recipient_id: new mongoose.Types.ObjectId(userId), read: false },
+      { $set: { read: true } }
+    );
+  } catch (error) {
+    console.error('Error updating notifications:', error);
+    throw new Error('Failed to update notifications');
+  }
+}
+
+
 }
 
 // Exportamos una instancia para uso global

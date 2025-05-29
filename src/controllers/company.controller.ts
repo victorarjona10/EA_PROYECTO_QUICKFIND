@@ -449,6 +449,18 @@ export async function updateCompanyPhotos(
   }
 }
 
+//funcion que usa user service para obtener las compañias que sigue un usuario
+export async function getFollowersCompanies (req: Request, res: Response): Promise<void> {
+  try {
+    const CompanyId = req.params.id; 
+    const followersCompanies = await companyService.getFollowersCompanies(CompanyId);
+    res.status(200).json(followersCompanies);
+  } catch (error) {
+    console.error("Error in getFollowedCompanies:", error);
+    res.status(500).json({ message: "Error getting followed companies", error });
+  }
+}
+
 
 
 

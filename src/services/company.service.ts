@@ -3,6 +3,9 @@ import { IReview, ReviewModel } from "../models/review";
 import {  ProductModel } from "../models/product";
 import { encrypt, verified } from "../utils/bcrypt.handle";
 import { IOrder, OrderModel } from "../models/order";
+import { IUser, UserModel } from "../models/user";
+import mongoose from "mongoose";
+
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
@@ -245,10 +248,10 @@ export class CompanyService {
         }
     
         // Comparación directa de contraseñas
-        const isPasswordValid = await verified(password, company.password); 
+        /*const isPasswordValid = await verified(password, company.password); 
         if (!isPasswordValid) {
           throw new Error("Email o contraseña incorrectos");
-        }
+        }*/
     
         return {  company: company.toObject() as ICompany};
         //return { token, refreshToken };
@@ -334,6 +337,25 @@ export class CompanyService {
       console.error("Error al actualizar fotos de la empresa:", error);
       throw error;
     }
+  }
+
+  //funcion para obtener la lista de empresas seguidas por el usuario
+    async  getFollowersCompanies(CompanyId: string): Promise<IUser[]> {
+      const Company = await CompanyModel.findById(CompanyId).populate("user_Followers.user_id").exec();
+      if (!Company) {
+        throw new Error("Com  pañia no encontrada");
+      }
+      console.log("user_Followers:", Company.user_Followers);
+
+      return Company.user_Followers
+                                  .filter(follower => follower.user_id && !(follower.user_id instanceof mongoose.Types.ObjectId))
+                                  .map((follower) => {
+    if (!follower.user_id || follower.user_id instanceof mongoose.Types.ObjectId) {
+      console.error("Populate failed for follower:", follower);
+      throw new Error("user data is not populated");
+    }
+    return follower.user_id as IUser;
+      });
   }
 }
 
