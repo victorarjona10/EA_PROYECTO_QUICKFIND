@@ -21,6 +21,7 @@ import { notificationService } from "./services/notification.service";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { initializeSocketIO } from "./socket";
+import feedbackRoutes from "./routes/feedback.routes";
 
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
@@ -109,7 +110,7 @@ app.use("/api/products", productsRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/orders", pedidosRoutes);
 app.use("/api/admins", adminRoutes);
-
+app.use("/api/feedback", feedbackRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // ================= Google Test登录回调测试路由 =================
