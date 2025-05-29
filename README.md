@@ -27,3 +27,6 @@ npm i nodemon
 npm install ts-node --save-dev
 ```
 para runnearlo npx ts-node app.ts
+
+## Estat de l'excercisi:
+S'han creat les funcions pertinents per realitzar l'excercisi: follow, unfollow, llistar seguidors i llistar seguits d'usuaris 
