@@ -13,6 +13,7 @@
     "**/*.{js,ts}": "eslint"
   },
   "dependencies": {
+    "@simplewebauthn/server": "^13.1.1",
     "@types/passport": "^1.0.17",
     "@types/socket.io-client": "^1.4.36",
     "@types/swagger-jsdoc": "^6.0.4",

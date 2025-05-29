@@ -19,11 +19,11 @@ import dotenv from "dotenv";
 import notificationRoutes from "./routes/notification.routes";
 import { notificationService } from "./services/notification.service";
 import http from "http";
-import { Server as SocketIOServer } from "socket.io";
 import { initializeSocketIO } from "./socket";
 
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
+const PORT = parseInt(process.env.PORT || "4000", 10);
 const app = express();
 const server = http.createServer(app);
 // Inicializamos Socket.IO en el servidor
@@ -36,7 +36,6 @@ console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 console.log("GOOGLE_REDIRECT_URI:", process.env.GOOGLE_REDIRECT_URI);
 // Removed duplicate import of axios
-const PORT = process.env.PORT || 4000;
 
 // ================= Google OAuth 配置 =================
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -126,9 +125,9 @@ app.use(
 
 app.use(routeNotFound); //Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-server.listen(PORT, () => {
-  console.log(`Server running at  http://localhost:${PORT}`);
-  console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${PORT}`);
+  console.log(`Swagger running at http://0.0.0.0:${PORT}/api-docs/`);
 });
 
 export default app;
