@@ -7,7 +7,10 @@ export interface IProduct {
   rating: number;
   description: string;
   price: number;
-  
+  available: boolean;
+  image?: string;
+  category?: string;
+  stock?: number;
 }
 
 
@@ -18,6 +21,10 @@ const productSchema = new Schema<IProduct>({
     rating: { type: Number, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
+    available: { type: Boolean, required: true, default: false },
+    image: { type: String, required: false, default: "" },
+    category: { type: String, required: false },
+    stock: { type: Number, required: false, default: 0 },
   });
   
   export const ProductModel = model("Product", productSchema);
