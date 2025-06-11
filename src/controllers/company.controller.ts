@@ -321,11 +321,7 @@ export async function addProductToCompany(
       error.message === "Producto no encontrado"
     ) {
       res.status(404).json({ message: error.message });
-    } else if (
-      error.message === "El producto ya está asociado a esta empresa"
-    ) {
-      res.status(409).json({ message: error.message });
-    } else {
+    }else {
       res.status(500).json({
         message: "Error al añadir producto a la empresa",
         error: error.message,
