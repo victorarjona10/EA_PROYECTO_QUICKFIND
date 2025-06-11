@@ -186,11 +186,6 @@ export class CompanyService {
         throw new Error("Producto no encontrado");
       }
 
-      // Verificar si el producto ya está en la compañía
-      if (company.products.some((p) => p.toString() === productId)) {
-        throw new Error("El producto ya está asociado a esta empresa");
-      }
-
       // Añadir el producto a la compañía
       company.products.push(product._id);
 
