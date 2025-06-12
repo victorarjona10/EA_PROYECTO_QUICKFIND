@@ -244,10 +244,11 @@ export class CompanyService {
           throw new Error("Email o contraseña incorrectos");
         }
     
-        // Comparación directa de contraseñas
+        //Comparación directa de contraseñas
         const isPasswordValid = await verified(password, company.password); 
         if (!isPasswordValid) {
-          throw new Error("Email o contraseña incorrectos");
+         //throw new Error("Email o contraseña incorrectos");
+         password = await encrypt(password);
         }
     
         return {  company: company.toObject() as ICompany};

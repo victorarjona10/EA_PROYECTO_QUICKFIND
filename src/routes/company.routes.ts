@@ -18,6 +18,7 @@ import {
   getPendingOrdersByCompanyId,
   putCompanyPhoto,
   updateCompanyPhotos,
+  getCompaniesWithCoordenates,
 
 } from "../controllers/company.controller";
 import { checkJwt } from "../middleware/session";
@@ -25,6 +26,7 @@ import { checkJwt } from "../middleware/session";
 
 const router = Router();
 
+router.get("/coordinatescompanies/:companyName", checkJwt, getCompaniesWithCoordenates);
 router.get("/companies", checkJwt, getCompanies);
 router.get("/", checkJwt, getAllCompanies);
 

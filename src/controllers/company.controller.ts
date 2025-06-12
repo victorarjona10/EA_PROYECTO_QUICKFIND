@@ -207,6 +207,66 @@ export async function getCompanies(req: Request, res: Response): Promise<void> {
   }
 }
 
+export async function getCompaniesWithCoordenates(req: Request, res: Response): Promise<void> {
+  // Clave de API de Google Maps
+  const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY; // Reemplaza con tu clave de API
+  //const ejemplo_solicitud = 'http://localhost:3000/companies?query=restaurant&lat=41.2804038&lng=1.9848002&radius=300';
+  try {
+    // Obtén los parámetros de la consulta
+    const query = req.params.companyName // Palabra clave para buscar
+    const lat = parseFloat(req.query.lat as string) || 41.2804038; // Latitud
+    const lng = parseFloat(req.query.lng as string) || 1.9848002; // Longitud
+    const radius = parseInt(req.query.radius as string) || 300; // Radio en metros
+
+    // URL de la API de Google Places
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json`;
+
+    // Realiza la solicitud a la API de Google Places
+    const response = await axios.get(url, {
+      params: {
+        query: query,
+        location: `${lat},${lng}`,
+        radius: radius,
+        key: GOOGLE_API_KEY,
+      },
+    });
+
+    // Procesa los resultados para devolver solo los datos necesarios
+    const data = response.data as { results: any[] }; // Explicitly type response.data
+    const results = data.results.map((place: any) => ({
+      name: place.name,
+      address: place.formatted_address,
+      location: place.geometry?.location
+        ? {
+            lat: place.geometry.location.lat,
+            lng: place.geometry.location.lng,
+          }
+        : null,
+      rating: place.rating,
+      userRatingsTotal: place.user_ratings_total,
+      placeId: place.place_id,
+      types: place.types,
+      openingHours: place.opening_hours,
+      photos: place.photos?.map((photo: any) => ({
+        photoReference: photo.photo_reference,
+        width: photo.width,
+        height: photo.height,
+      })),
+      priceLevel: place.price_level,
+      businessStatus: place.business_status,
+      icon: place.icon,
+      vicinity: place.vicinity,
+      plusCode: place.plus_code,
+    }));
+
+    // Devuelve los resultados al cliente
+    res.status(200).json(results);
+  } catch (error) {
+    console.error("Error al obtener lugares:");
+    res.status(500).json({ error: "Error al obtener lugares" });
+  }
+}
+
 export async function RateCompany(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
