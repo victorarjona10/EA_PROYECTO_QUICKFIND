@@ -32,5 +32,7 @@ router.get('/auth/google/callback', passport_1.default.authenticate('google', {
 router.post('/auth/refresh', user_controller_1.refreshAccesToken);
 router.put('/follows/:id', user_controller_1.addFollowed);
 router.put('/unfollow/:id', user_controller_1.UnfollowCompany);
+router.put('/pay/:id', session_1.checkJwt, user_controller_1.PayOrder);
+router.put('/addMoney/:id', session_1.checkJwt, user_controller_1.addMoney);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

@@ -27,4 +27,6 @@ export declare class UserService {
     UnfollowCompany(userId: string, companyId: string): Promise<IUser | null>;
     getFollowedCompanies(userId: string): Promise<ICompany[]>;
     getCompaniesByOwnerId(userId: string): Promise<ICompany[]>;
+    addMoney(userId: string, money: number): Promise<IUser | null>;
+    PayOrder(userId: string, orderId: string): Promise<IUser | null>;
 }

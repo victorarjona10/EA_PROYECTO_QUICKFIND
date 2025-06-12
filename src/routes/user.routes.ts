@@ -3,7 +3,7 @@ import { checkJwt } from '../middleware/session';
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 const router = Router();
-import {getAllCompanies, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
+import {getAllCompanies, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany, PayOrder, addMoney } from '../controllers/user.controller'
 import passport from 'passport';
 
 
@@ -42,4 +42,6 @@ router.get(
 router.post('/auth/refresh', refreshAccesToken);
 router.put('/follows/:id', addFollowed);
 router.put('/unfollow/:id', UnfollowCompany);
+router.put('/pay/:id', checkJwt, PayOrder);
+router.put('/addMoney/:id', checkJwt, addMoney);
 export default router;

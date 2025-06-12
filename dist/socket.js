@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initializeSocketIO = initializeSocketIO;
 exports.getIO = getIO;
@@ -16,6 +19,10 @@ exports.getChatNamespace = getChatNamespace;
 const socket_io_1 = require("socket.io");
 const jwt_handle_1 = require("./utils/jwt.handle");
 const chat_service_1 = require("./services/chat.service");
+const fs_1 = __importDefault(require("fs"));
+const logToFile = (message) => {
+    fs_1.default.appendFileSync('chat.log', `${new Date().toISOString()} - ${message}\n`);
+};
 let io;
 function initializeSocketIO(server) {
     io = new socket_io_1.Server(server, {
@@ -24,7 +31,6 @@ function initializeSocketIO(server) {
             credentials: true,
         },
     });
-    console.log("Socket.IO inicializado");
     return io;
 }
 function getIO() {
@@ -40,8 +46,7 @@ function initializeChatService() {
     }
     const chatNamespace = io.of('/chat');
     chatNamespace.on('connection', (socket) => {
-        console.log(`Usuario conectado al chat: ${socket.id}`);
-        socket.use(([event, ...args], next) => {
+        socket.use(([_event, ..._args], next) => {
             const token = socket.handshake.auth.token;
             if (!token)
                 return next(new Error('unauthorized'));
@@ -55,14 +60,12 @@ function initializeChatService() {
         });
         socket.on('error', (err) => {
             if (err && err.message === 'unauthorized') {
-                console.debug('unauthorized user');
                 socket.emit('status', { status: 'unauthorized' });
                 socket.disconnect();
             }
         });
         socket.on('join_room', (roomId) => __awaiter(this, void 0, void 0, function* () {
             socket.join(roomId);
-            console.log(`User ${socket.id} joined room ${roomId}`);
             try {
                 const messageHistory = yield chatService.getMessagesByRoom(roomId, 50);
                 const formattedHistory = messageHistory.map(msg => ({
@@ -101,10 +104,9 @@ function initializeChatService() {
             }
         }));
         socket.on('disconnect', () => {
-            console.log(`Usuario desconectado del chat: ${socket.id}`);
+            logToFile(`Usuario desconectado del chat: ${socket.id}`);
         });
     });
-    console.log('Servicio de chat inicializado en namespace /chat');
     return chatNamespace;
 }
 function getChatNamespace() {

@@ -20,6 +20,8 @@ const jwt_handle_1 = require("../utils/jwt.handle");
 const bcrypt_handle_2 = require("../utils/bcrypt.handle");
 const uuid_1 = require("uuid");
 const company_1 = require("../models/company");
+const order_1 = require("../models/order");
+const product_1 = require("../models/product");
 class UserService {
     getAllUsers(page, limit) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -238,6 +240,53 @@ class UserService {
                 console.error("Error al obtener las compañías del usuario:", error);
                 throw error;
             }
+        });
+    }
+    addMoney(userId, money) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(userId);
+            if (!user) {
+                throw new Error("Usuario no encontrado");
+            }
+            if (money <= 0) {
+                throw new Error("La cantidad a añadir debe ser mayor que cero");
+            }
+            user.wallet += money;
+            return yield user.save();
+        });
+    }
+    PayOrder(userId, orderId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(userId);
+            if (!user) {
+                throw new Error("Usuario no encontrado");
+            }
+            const order = yield order_1.OrderModel.findById(orderId);
+            if (!order) {
+                throw new Error("Pedido no encontrado");
+            }
+            let total = 0;
+            for (const item of order.products) {
+                const product = yield product_1.ProductModel.findById(item.product_id);
+                if (!product) {
+                    throw new Error(`Producto con id ${item.product_id} no encontrado`);
+                }
+                total += product.price * item.quantity;
+            }
+            if (user.wallet < total) {
+                throw new Error("Saldo insuficiente en la billetera del usuario");
+            }
+            for (const item of order.products) {
+                const product = yield product_1.ProductModel.findById(item.product_id);
+                if (product && product.stock !== undefined) {
+                    product.stock -= item.quantity;
+                    yield product.save();
+                }
+            }
+            user.wallet -= total;
+            order.status = "Finalizada";
+            yield order.save();
+            return yield user.save();
         });
     }
 }

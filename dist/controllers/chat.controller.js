@@ -73,7 +73,6 @@ function getCompanyChats(req, res) {
                 return;
             }
             const rooms = yield chat_service_1.chatService.getCompanyChats(companyId);
-            console.log(rooms, rooms.length);
             res.status(200).json({
                 success: true,
                 count: rooms.length,

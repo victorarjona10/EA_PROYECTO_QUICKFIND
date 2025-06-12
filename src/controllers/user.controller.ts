@@ -531,3 +531,39 @@ export async function getAllCompanies (req: Request, res: Response): Promise<voi
     res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
+
+export async function addMoney (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const { amount } = req.body;
+
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+      res.status(400).json({ message: "Cantidad inválida" });
+      return;
+    }
+
+    const updatedUser = await userService.addMoney(userId, amount);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in addMoney:", error);
+    res.status(500).json({ message: "Error adding money", error });
+  }
+}
+
+export async function PayOrder (req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id; 
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      res.status(400).json({ message: "Order ID is required" });
+      return;
+    }
+
+    const updatedUser = await userService.PayOrder(userId, orderId);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in PayOrder:", error);
+    res.status(500).json({ message: "Error paying order", error });
+  }
+}

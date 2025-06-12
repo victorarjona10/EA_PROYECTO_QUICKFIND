@@ -37,7 +37,7 @@ console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 console.log("GOOGLE_REDIRECT_URI:", process.env.GOOGLE_REDIRECT_URI);
 // Removed duplicate import of axios
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT || "4000", 10);
 
 // ================= Google OAuth 配置 =================
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -120,14 +120,14 @@ app.get("/api/auth/google/callback/test", (req: Request, res: Response) => {
 
 app.use(
   cors({
-    origin: ["http://localhost:4200", "http://localhost:3000"],
+    origin: '*',
     credentials: true,
   })
 );
 
 app.use(routeNotFound); //Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0" , () => {
   console.log(`Server running at  http://localhost:${PORT}`);
   console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
 });
