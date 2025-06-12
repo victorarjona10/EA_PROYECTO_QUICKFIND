@@ -19,6 +19,7 @@ exports.updateCompanyById = updateCompanyById;
 exports.deleteCompanyById = deleteCompanyById;
 exports.getCompanyWithProductsById = getCompanyWithProductsById;
 exports.getCompanies = getCompanies;
+exports.getCompaniesWithCoordenates = getCompaniesWithCoordenates;
 exports.RateCompany = RateCompany;
 exports.reviewCompany = reviewCompany;
 exports.getCompanyReviews = getCompanyReviews;
@@ -171,6 +172,60 @@ function getCompanies(req, res) {
         const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
         try {
             const query = req.query.query || "Carrefour";
+            const lat = parseFloat(req.query.lat) || 41.2804038;
+            const lng = parseFloat(req.query.lng) || 1.9848002;
+            const radius = parseInt(req.query.radius) || 300;
+            const url = `https://maps.googleapis.com/maps/api/place/textsearch/json`;
+            const response = yield axios_1.default.get(url, {
+                params: {
+                    query: query,
+                    location: `${lat},${lng}`,
+                    radius: radius,
+                    key: GOOGLE_API_KEY,
+                },
+            });
+            const data = response.data;
+            const results = data.results.map((place) => {
+                var _a, _b;
+                return ({
+                    name: place.name,
+                    address: place.formatted_address,
+                    location: ((_a = place.geometry) === null || _a === void 0 ? void 0 : _a.location)
+                        ? {
+                            lat: place.geometry.location.lat,
+                            lng: place.geometry.location.lng,
+                        }
+                        : null,
+                    rating: place.rating,
+                    userRatingsTotal: place.user_ratings_total,
+                    placeId: place.place_id,
+                    types: place.types,
+                    openingHours: place.opening_hours,
+                    photos: (_b = place.photos) === null || _b === void 0 ? void 0 : _b.map((photo) => ({
+                        photoReference: photo.photo_reference,
+                        width: photo.width,
+                        height: photo.height,
+                    })),
+                    priceLevel: place.price_level,
+                    businessStatus: place.business_status,
+                    icon: place.icon,
+                    vicinity: place.vicinity,
+                    plusCode: place.plus_code,
+                });
+            });
+            res.status(200).json(results);
+        }
+        catch (error) {
+            console.error("Error al obtener lugares:");
+            res.status(500).json({ error: "Error al obtener lugares" });
+        }
+    });
+}
+function getCompaniesWithCoordenates(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+        try {
+            const query = req.params.companyName;
             const lat = parseFloat(req.query.lat) || 41.2804038;
             const lng = parseFloat(req.query.lng) || 1.9848002;
             const radius = parseInt(req.query.radius) || 300;

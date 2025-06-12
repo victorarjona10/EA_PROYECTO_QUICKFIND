@@ -30,6 +30,10 @@ exports.Google = Google;
 exports.addFollowed = addFollowed;
 exports.UnfollowCompany = UnfollowCompany;
 exports.getFollowedCompanies = getFollowedCompanies;
+exports.FollowUser = FollowUser;
+exports.UnfollowUser = UnfollowUser;
+exports.getFollowedUsers = getFollowedUsers;
+exports.getFollowingUsers = getFollowingUsers;
 exports.getAllCompanies = getAllCompanies;
 exports.addMoney = addMoney;
 exports.PayOrder = PayOrder;
@@ -361,6 +365,60 @@ function getFollowedCompanies(req, res) {
         catch (error) {
             console.error("Error in getFollowedCompanies:", error);
             res.status(500).json({ message: "Error getting followed companies", error });
+        }
+    });
+}
+function FollowUser(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const { currentUserId } = req.body;
+            const updatedUser = yield userService.FollowUser(currentUserId, userId);
+            res.status(200).json(updatedUser);
+        }
+        catch (error) {
+            console.error("Error in FollowUser:", error);
+            res.status(500).json({ message: "Error following user", error });
+        }
+    });
+}
+function UnfollowUser(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const { currentUserId } = req.body;
+            const updatedUser = yield userService.UnfollowUser(currentUserId, userId);
+            res.status(200).json(updatedUser);
+        }
+        catch (error) {
+            console.error("Error in UnfollowUser:", error);
+            res.status(500).json({ message: "Error unfollowing user", error });
+        }
+    });
+}
+function getFollowedUsers(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const followedUsers = yield userService.getFollowedUsers(userId);
+            res.status(200).json(followedUsers);
+        }
+        catch (error) {
+            console.error("Error in getFollowedUsers:", error);
+            res.status(500).json({ message: "Error getting followed users", error });
+        }
+    });
+}
+function getFollowingUsers(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const followingUsers = yield userService.getFollowingUsers(userId);
+            res.status(200).json(followingUsers);
+        }
+        catch (error) {
+            console.error("Error in getFollowingUsers:", error);
+            res.status(500).json({ message: "Error getting following users", error });
         }
     });
 }

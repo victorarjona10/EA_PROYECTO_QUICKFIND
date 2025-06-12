@@ -6,6 +6,7 @@ export declare function updateCompanyById(req: Request, res: Response): Promise<
 export declare function deleteCompanyById(req: Request, res: Response): Promise<void>;
 export declare function getCompanyWithProductsById(req: Request, res: Response): Promise<void>;
 export declare function getCompanies(req: Request, res: Response): Promise<void>;
+export declare function getCompaniesWithCoordenates(req: Request, res: Response): Promise<void>;
 export declare function RateCompany(req: Request, res: Response): Promise<void>;
 export declare function reviewCompany(req: Request, res: Response): Promise<void>;
 export declare function getCompanyReviews(req: Request, res: Response): Promise<void>;

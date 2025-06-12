@@ -18,6 +18,8 @@ router.get('/:id', session_1.checkJwt, user_controller_1.getUserById);
 router.get('/name/:name', session_1.checkJwt, user_controller_1.getUserByName);
 router.get('/email/:email', session_1.checkJwt, user_controller_1.getUserByEmail);
 router.get('/followedCompanies/:id', session_1.checkJwt, user_controller_1.getFollowedCompanies);
+router.get('/followedUsers/:id', session_1.checkJwt, user_controller_1.getFollowedUsers);
+router.get('/followingUsers/:id', session_1.checkJwt, user_controller_1.getFollowingUsers);
 router.get('/companies/:id', session_1.checkJwt, user_controller_1.getAllCompanies);
 router.put("/updateAvatar", session_1.checkJwt, user_controller_1.updateAvatar);
 router.put('/:id', session_1.checkJwt, user_controller_1.updateUserById);
@@ -34,5 +36,7 @@ router.put('/follows/:id', user_controller_1.addFollowed);
 router.put('/unfollow/:id', user_controller_1.UnfollowCompany);
 router.put('/pay/:id', session_1.checkJwt, user_controller_1.PayOrder);
 router.put('/addMoney/:id', session_1.checkJwt, user_controller_1.addMoney);
+router.put('/followUser/:id', session_1.checkJwt, user_controller_1.FollowUser);
+router.put('/Userunfollow/:id', session_1.checkJwt, user_controller_1.UnfollowUser);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

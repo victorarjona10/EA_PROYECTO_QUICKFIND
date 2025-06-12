@@ -227,6 +227,66 @@ class UserService {
             });
         });
     }
+    FollowUser(userId, userToFollowId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(userId);
+            if (!user) {
+                throw new Error("Usuario no encontrado");
+            }
+            const alreadyFollowed = user.user_Followed.some((followedUser) => followedUser.user_id.toString() === userToFollowId);
+            if (alreadyFollowed) {
+                throw new Error("Ya sigues a este usuario");
+            }
+            user.user_Followed.push({ user_id: new mongoose_1.default.Types.ObjectId(userToFollowId) });
+            user.following++;
+            const followedUser = yield user_1.UserModel.findById(userToFollowId);
+            if (followedUser) {
+                followedUser.followers++;
+                yield followedUser.save();
+            }
+            return yield user.save();
+        });
+    }
+    UnfollowUser(userId, userToUnfollowId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(userId);
+            if (!user) {
+                throw new Error("Usuario no encontrado");
+            }
+            const userIndex = user.user_Followed.findIndex((followedUser) => followedUser.user_id.toString() === userToUnfollowId);
+            if (userIndex === -1) {
+                throw new Error("No sigues a este usuario");
+            }
+            user.user_Followed.splice(userIndex, 1);
+            user.following--;
+            const unfollowedUser = yield user_1.UserModel.findById(userToUnfollowId);
+            if (unfollowedUser) {
+                unfollowedUser.followers--;
+                yield unfollowedUser.save();
+            }
+            return yield user.save();
+        });
+    }
+    getFollowedUsers(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(userId).populate("user_Followed.user_id");
+            if (!user) {
+                throw new Error("Usuario no encontrado");
+            }
+            return user.user_Followed.map((followedUser) => {
+                if (followedUser.user_id instanceof mongoose_1.default.Types.ObjectId) {
+                    throw new Error("User data is not populated");
+                }
+                return followedUser.user_id;
+            });
+        });
+    }
+    getFollowingUsers(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const followers = yield user_1.UserModel.find({ "user_Followed.user_id": userId }).populate("user_Followed.user_id");
+            return followers;
+        });
+    }
     getCompaniesByOwnerId(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

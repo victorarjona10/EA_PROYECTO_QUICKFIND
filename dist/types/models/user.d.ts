@@ -16,6 +16,11 @@ export interface IUser {
     company_Followed: {
         company_id: mongoose.Types.ObjectId;
     }[];
+    user_Followed: {
+        user_id: mongoose.Types.ObjectId;
+    }[];
+    followers: number;
+    following: number;
 }
 export declare const UserModel: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unknown, {}, IUser, {}> & IUser & Required<{
     _id: Schema.Types.ObjectId;

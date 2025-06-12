@@ -32,6 +32,17 @@ const userSchema = new mongoose_1.Schema({
             },
         },
     ],
+    user_Followed: [
+        {
+            user_id: {
+                type: mongoose_2.default.Types.ObjectId,
+                ref: 'User',
+                required: false
+            },
+        },
+    ],
+    followers: { type: Number, default: 0 },
+    following: { type: Number, default: 0 }
 });
 exports.UserModel = (0, mongoose_1.model)("User", userSchema);
 //# sourceMappingURL=user.js.map

@@ -18,6 +18,10 @@ export declare const googleCallback: (req: Request, res: Response) => Promise<vo
 export declare function addFollowed(req: Request, res: Response): Promise<void>;
 export declare function UnfollowCompany(req: Request, res: Response): Promise<void>;
 export declare function getFollowedCompanies(req: Request, res: Response): Promise<void>;
+export declare function FollowUser(req: Request, res: Response): Promise<void>;
+export declare function UnfollowUser(req: Request, res: Response): Promise<void>;
+export declare function getFollowedUsers(req: Request, res: Response): Promise<void>;
+export declare function getFollowingUsers(req: Request, res: Response): Promise<void>;
 export declare function getAllCompanies(req: Request, res: Response): Promise<void>;
 export declare function addMoney(req: Request, res: Response): Promise<void>;
 export declare function PayOrder(req: Request, res: Response): Promise<void>;
