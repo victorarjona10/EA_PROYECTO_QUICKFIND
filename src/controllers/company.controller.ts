@@ -322,6 +322,7 @@ export async function addProductToCompany(
     ) {
       res.status(404).json({ message: error.message });
     } else {
+
       res.status(500).json({
         message: "Error al añadir producto a la empresa",
         error: error.message,
