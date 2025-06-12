@@ -25,7 +25,7 @@ export async function postCompany(req: Request, res: Response): Promise<void> {
       res.status(400).json({ message: "El id del propietario es obligatorio" });
       return;
     }
-    
+
     const newCompany = await companyService.postCompany(company);
     res.status(200).json(newCompany);
     return;
@@ -178,9 +178,9 @@ export async function getCompanies(req: Request, res: Response): Promise<void> {
       address: place.formatted_address,
       location: place.geometry?.location
         ? {
-            lat: place.geometry.location.lat,
-            lng: place.geometry.location.lng,
-          }
+          lat: place.geometry.location.lat,
+          lng: place.geometry.location.lng,
+        }
         : null,
       rating: place.rating,
       userRatingsTotal: place.user_ratings_total,
@@ -321,10 +321,6 @@ export async function addProductToCompany(
       error.message === "Producto no encontrado"
     ) {
       res.status(404).json({ message: error.message });
-    } else if (
-      error.message === "El producto ya está asociado a esta empresa"
-    ) {
-      res.status(409).json({ message: error.message });
     } else {
       res.status(500).json({
         message: "Error al añadir producto a la empresa",
@@ -348,7 +344,7 @@ export async function getCompanyByName(req: Request, res: Response): Promise<voi
     res.status(200).json(companies);
   } catch (error) {
     console.error("Error en getCompanySearch Controller:", error);
-    res.status(500).json({ message: "Error al buscar compañías"});
+    res.status(500).json({ message: "Error al buscar compañías" });
   }
 }
 
@@ -370,35 +366,35 @@ export async function getCompaniesByProductName(req: Request, res: Response): Pr
 }
 
 export async function loginCompany(req: Request, res: Response): Promise<void> {
-      try {
-          const { email, password } = req.body;
-          if (!email || !password) {
-              res.status(400).json({ message: "Email y contraseña son obligatorios" });
-              return;
-          }
-          const company = await companyService.loginCompany(email, password);
-          if (!company) {
-              res.status(401).json({ message: "Email o contraseña incorrectos" });
-              return;
-          }
-          res.status(200).json(company);
-      } catch (error) {
-          res.status(500).json({ message: "Error al iniciar sesión", error });
-      }
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ message: "Email y contraseña son obligatorios" });
+      return;
+    }
+    const company = await companyService.loginCompany(email, password);
+    if (!company) {
+      res.status(401).json({ message: "Email o contraseña incorrectos" });
+      return;
+    }
+    res.status(200).json(company);
+  } catch (error) {
+    res.status(500).json({ message: "Error al iniciar sesión", error });
+  }
 }
 
 export async function updateCompanyAvatar(req: Request, res: Response): Promise<void> {
   try {
     const { email, avatar } = req.body;
-  
+
     await companyService.updateAvatar(avatar, email);
-    res.status(200).json({message: "Avatar actualizado correctamente"});
+    res.status(200).json({ message: "Avatar actualizado correctamente" });
     return;
   } catch (error) {
     res.status(500).json({ message: "Error updating avatar", error });
     return;
   }
-    
+
 }
 
 export async function getPendingOrdersByCompanyId(
@@ -453,5 +449,5 @@ export async function updateCompanyPhotos(
 
 
 
-    
+
 

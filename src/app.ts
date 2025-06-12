@@ -7,6 +7,7 @@ import productsRoutes from "./routes/product.routes";
 import companyRoutes from "./routes/company.routes";
 import pedidosRoutes from "./routes/order.routes";
 import adminRoutes from "./routes/admin.routes";
+import chatRoutes from "./routes/chat.routes";
 import { corsHandler } from "./middleware/corsHandler";
 import cors from "cors";
 import { loggingHandler } from "./middleware/loggingHandler";
@@ -19,8 +20,7 @@ import dotenv from "dotenv";
 import notificationRoutes from "./routes/notification.routes";
 import { notificationService } from "./services/notification.service";
 import http from "http";
-import { Server as SocketIOServer } from "socket.io";
-import { initializeSocketIO } from "./socket";
+import { initializeSocketIO, initializeChatService } from "./socket";
 
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
@@ -28,6 +28,7 @@ const app = express();
 const server = http.createServer(app);
 // Inicializamos Socket.IO en el servidor
 const io = initializeSocketIO(server);
+initializeChatService();
 notificationService.initializeListeners();
 export { io };
 app.use("/public", express.static(path.join(__dirname, "../public")));
@@ -109,7 +110,7 @@ app.use("/api/products", productsRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/orders", pedidosRoutes);
 app.use("/api/admins", adminRoutes);
-
+app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // ================= Google Test登录回调测试路由 =================

@@ -1,6 +1,6 @@
 import { ICompany, CompanyModel } from "../models/company";
 import { IReview, ReviewModel } from "../models/review";
-import {  ProductModel } from "../models/product";
+import { ProductModel } from "../models/product";
 import { encrypt, verified } from "../utils/bcrypt.handle";
 import { IOrder, OrderModel } from "../models/order";
 
@@ -9,20 +9,20 @@ export class CompanyService {
     try {
 
       const newCompany = new CompanyModel({
-      ...company,
-      rating: company.rating ?? 0,
-      userRatingsTotal: company.userRatingsTotal ?? 0,
-      products: company.products ?? [],
-      reviews: company.reviews ?? [],
-      wallet: company.wallet ?? 0,
-      followers: company.followers ?? 0,
-      photos: company.photos ?? [],
-      icon: company.icon ?? "https://res.cloudinary.com/dqj8xgq4h/image/upload/v1697060982/CompanyIcon_1_ojzv5c.png"
-    });
-    if (!company.password) {
-      throw new Error("Password is required");
-    }
-    newCompany.password = await encrypt(company.password); // Asegúrate de que company.password no sea undefined
+        ...company,
+        rating: company.rating ?? 0,
+        userRatingsTotal: company.userRatingsTotal ?? 0,
+        products: company.products ?? [],
+        reviews: company.reviews ?? [],
+        wallet: company.wallet ?? 0,
+        followers: company.followers ?? 0,
+        photos: company.photos ?? [],
+        icon: company.icon ?? "https://res.cloudinary.com/dqj8xgq4h/image/upload/v1697060982/CompanyIcon_1_ojzv5c.png"
+      });
+      if (!company.password) {
+        throw new Error("Password is required");
+      }
+      newCompany.password = await encrypt(company.password); // Asegúrate de que company.password no sea undefined
       return newCompany.save();
     } catch (error: any) {
       if (error.code === 11000) {
@@ -93,7 +93,7 @@ export class CompanyService {
       );
     }
     if (!review._id) {
-        delete review._id;
+      delete review._id;
     }
 
     const company = await CompanyModel.findById(review.company_id);
@@ -108,7 +108,7 @@ export class CompanyService {
     });
     if (existingReview) {
       // Actualiza la reseña existente
-      
+
 
       const updatedReview = await ReviewModel.findByIdAndUpdate(
         existingReview._id,
@@ -118,7 +118,7 @@ export class CompanyService {
       if (!updatedReview) {
         throw new Error("Error al actualizar la reseña");
       }
-      
+
 
       // Actualiza la calificación de la empresa
       const updatedRating = parseFloat(
@@ -140,9 +140,9 @@ export class CompanyService {
       return updatedReview;
     } else {
       // Crea una nueva reseña
-      
+
       const newReview = new ReviewModel(review);
-      
+
       company.reviews?.push(newReview._id);
       company.rating = parseFloat(
         (
@@ -186,11 +186,6 @@ export class CompanyService {
         throw new Error("Producto no encontrado");
       }
 
-      // Verificar si el producto ya está en la compañía
-      if (company.products.some((p) => p.toString() === productId)) {
-        throw new Error("El producto ya está asociado a esta empresa");
-      }
-
       // Añadir el producto a la compañía
       company.products.push(product._id);
 
@@ -216,48 +211,48 @@ export class CompanyService {
   }
 
   async getCompaniesByProductName(productName: string): Promise<ICompany[]> {
-  try {
-    // Buscar productos que coincidan con el nombre proporcionado
-    const matchedProducts = await ProductModel.find({
-      $text: { $search: productName },
-    }).exec();
+    try {
+      // Buscar productos que coincidan con el nombre proporcionado
+      const matchedProducts = await ProductModel.find({
+        $text: { $search: productName },
+      }).exec();
 
-    // Extraer los IDs de las empresas asociadas a los productos encontrados
-    const companyIds = matchedProducts.map((product) => product.companyId);
+      // Extraer los IDs de las empresas asociadas a los productos encontrados
+      const companyIds = matchedProducts.map((product) => product.companyId);
 
-    // Eliminar duplicados de los IDs de las empresas
-    const uniqueCompanyIds = [...new Set(companyIds)];
+      // Eliminar duplicados de los IDs de las empresas
+      const uniqueCompanyIds = [...new Set(companyIds)];
 
-    // Buscar las empresas por sus IDs
-    const companies = await CompanyModel.find({ _id: { $in: uniqueCompanyIds } }).exec();
+      // Buscar las empresas por sus IDs
+      const companies = await CompanyModel.find({ _id: { $in: uniqueCompanyIds } }).exec();
 
-    return companies;
-  } catch (error) {
-    console.error("Error al buscar empresas por nombre de producto:", error);
-    throw new Error("No se pudieron buscar las empresas");
+      return companies;
+    } catch (error) {
+      console.error("Error al buscar empresas por nombre de producto:", error);
+      throw new Error("No se pudieron buscar las empresas");
+    }
   }
-}
-  
-    async loginCompany(email: string, password: string): Promise<{ company: ICompany }> {
-        const company = await CompanyModel.findOne({ email });
-        if (!company) {
-          throw new Error("Email o contraseña incorrectos");
-        }
-    
-        // Comparación directa de contraseñas
-        const isPasswordValid = await verified(password, company.password); 
-        if (!isPasswordValid) {
-          throw new Error("Email o contraseña incorrectos");
-        }
-    
-        return {  company: company.toObject() as ICompany};
-        //return { token, refreshToken };
-      }
-  
-      async updateAvatar( avatar:string, email: string): Promise<ICompany | null>{
-          return await CompanyModel.findOneAndUpdate({email:email}, { icon: avatar }, { new: true });
-        }
-  
+
+  async loginCompany(email: string, password: string): Promise<{ company: ICompany }> {
+    const company = await CompanyModel.findOne({ email });
+    if (!company) {
+      throw new Error("Email o contraseña incorrectos");
+    }
+
+    // Comparación directa de contraseñas
+    const isPasswordValid = await verified(password, company.password);
+    if (!isPasswordValid) {
+      throw new Error("Email o contraseña incorrectos");
+    }
+
+    return { company: company.toObject() as ICompany };
+    //return { token, refreshToken };
+  }
+
+  async updateAvatar(avatar: string, email: string): Promise<ICompany | null> {
+    return await CompanyModel.findOneAndUpdate({ email: email }, { icon: avatar }, { new: true });
+  }
+
   async addPendingOrderToCompany(
     companyId: string,
     orderId: string

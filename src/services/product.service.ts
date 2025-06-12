@@ -7,7 +7,7 @@ export class ProductService {
         return newProduct.save();
     }
 
-    
+
 
     async getAllProducts(): Promise<IProduct[]> {
         return ProductModel.find();

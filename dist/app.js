@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const database_1 = require("./database");
@@ -21,6 +22,7 @@ const product_routes_1 = __importDefault(require("./routes/product.routes"));
 const company_routes_1 = __importDefault(require("./routes/company.routes"));
 const order_routes_1 = __importDefault(require("./routes/order.routes"));
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
+const chat_routes_1 = __importDefault(require("./routes/chat.routes"));
 const corsHandler_1 = require("./middleware/corsHandler");
 const cors_1 = __importDefault(require("cors"));
 const loggingHandler_1 = require("./middleware/loggingHandler");
@@ -30,9 +32,18 @@ const passport_google_oauth20_1 = require("passport-google-oauth20");
 const express_session_1 = __importDefault(require("express-session"));
 const user_service_1 = require("./services/user.service");
 const dotenv_1 = __importDefault(require("dotenv"));
+const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
+const notification_service_1 = require("./services/notification.service");
+const http_1 = __importDefault(require("http"));
+const socket_1 = require("./socket");
 dotenv_1.default.config({ path: "../.env" });
 const app = (0, express_1.default)();
-app.use('/public', express_1.default.static(path_1.default.join(__dirname, '../public')));
+const server = http_1.default.createServer(app);
+const io = (0, socket_1.initializeSocketIO)(server);
+exports.io = io;
+(0, socket_1.initializeChatService)();
+notification_service_1.notificationService.initializeListeners();
+app.use("/public", express_1.default.static(path_1.default.join(__dirname, "../public")));
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 console.log("GOOGLE_REDIRECT_URI:", process.env.GOOGLE_REDIRECT_URI);
@@ -47,7 +58,7 @@ app.use((0, express_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-app.disable('etag');
+app.disable("etag");
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
@@ -87,15 +98,17 @@ app.use("/api/products", product_routes_1.default);
 app.use("/api/company", company_routes_1.default);
 app.use("/api/orders", order_routes_1.default);
 app.use("/api/admins", admin_routes_1.default);
+app.use("/api/chat", chat_routes_1.default);
+app.use("/api/notifications", notification_routes_1.default);
 app.get("/api/auth/google/callback/test", (req, res) => {
     res.send("Google OAuth Succcess! 回调成功！请检查控制台日志。");
 });
 app.use((0, cors_1.default)({
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
-    credentials: true
+    origin: ["http://localhost:4200", "http://localhost:3000"],
+    credentials: true,
 }));
 app.use(routeNotFound_1.routeNotFound);
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running at  http://localhost:${PORT}`);
     console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
 });

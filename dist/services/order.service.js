@@ -47,6 +47,11 @@ class PedidosService {
             }
         });
     }
+    updateOrderStatus(id, status) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield order_1.OrderModel.findByIdAndUpdate(id, { status }, { new: true }).populate('user_id').populate('products.product_id').exec();
+        });
+    }
     deletePedidoById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield order_1.OrderModel.findByIdAndDelete(id);
