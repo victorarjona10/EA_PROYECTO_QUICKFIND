@@ -5,6 +5,8 @@ import { generateToken } from "../utils/jwt.handle";
 import {encrypt} from "../utils/bcrypt.handle";
 import { v4 as uuidv4 } from "uuid";
 import { ICompany, CompanyModel } from "../models/company";
+import { OrderModel } from "../models/order";
+import { ProductModel } from "../models/product";
 
 import { Profile } from "passport-google-oauth20";
 
@@ -344,4 +346,55 @@ async getCompaniesByOwnerId(userId: string): Promise<ICompany[]> {
   }
 }
 
+async addMoney(userId: string, money: number): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        throw new Error("Usuario no encontrado");
+    }
+    if (money <= 0) {
+        throw new Error("La cantidad a añadir debe ser mayor que cero");
+    }
+
+    user.wallet += money;
+    return await user.save();
+  }
+
+async PayOrder(userId: string, orderId: string): Promise<IUser | null> {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+  const order = await OrderModel.findById(orderId);
+  if (!order) {
+    throw new Error("Pedido no encontrado");
+  }
+
+  let total = 0;
+  for (const item of order.products) {
+    const product = await ProductModel.findById(item.product_id);
+    if (!product) {
+      throw new Error(`Producto con id ${item.product_id} no encontrado`);
+    }
+    total += product.price * item.quantity;
+  }
+
+  if (user.wallet < total) {
+    throw new Error("Saldo insuficiente en la billetera del usuario");
+  }
+
+  for (const item of order.products) {
+    const product = await ProductModel.findById(item.product_id);
+    if (product && product.stock !== undefined) {
+      product.stock -= item.quantity;
+      await product.save();
+    }
+  }
+
+  user.wallet -= total;
+  order.status = "Finalizada";
+  await order.save();
+  return await user.save();
 }
+
+}
+

@@ -19,3 +19,5 @@ export declare function addFollowed(req: Request, res: Response): Promise<void>;
 export declare function UnfollowCompany(req: Request, res: Response): Promise<void>;
 export declare function getFollowedCompanies(req: Request, res: Response): Promise<void>;
 export declare function getAllCompanies(req: Request, res: Response): Promise<void>;
+export declare function addMoney(req: Request, res: Response): Promise<void>;
+export declare function PayOrder(req: Request, res: Response): Promise<void>;

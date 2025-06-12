@@ -20,4 +20,6 @@ export declare class CompanyService {
     updateAvatar(avatar: string, email: string): Promise<ICompany | null>;
     addPendingOrderToCompany(companyId: string, orderId: string): Promise<ICompany | null>;
     getPendingOrdersByCompanyId(companyId: string): Promise<IOrder[] | null>;
+    putCompanyPhoto(companyId: string, photo: string): Promise<ICompany | null>;
+    updateCompanyPhotos(companyId: string, photos: string[]): Promise<ICompany | null>;
 }

@@ -11,6 +11,8 @@ router.get("/searchProduct/:name", company_controller_1.getCompaniesByProductNam
 router.get("/pendingOrders/:id", session_1.checkJwt, company_controller_1.getPendingOrdersByCompanyId);
 router.post("/login", company_controller_1.loginCompany);
 router.put("/updateCompanyAvatar", session_1.checkJwt, company_controller_1.updateCompanyAvatar);
+router.put("/putCompanyPhoto/:id", session_1.checkJwt, company_controller_1.putCompanyPhoto);
+router.put("/updateCompanyPhotos/:id", session_1.checkJwt, company_controller_1.updateCompanyPhotos);
 router.post("/", session_1.checkJwt, company_controller_1.postCompany);
 router.put("/rate/:id", session_1.checkJwt, company_controller_1.RateCompany);
 router.post("/review/:id", session_1.checkJwt, company_controller_1.reviewCompany);

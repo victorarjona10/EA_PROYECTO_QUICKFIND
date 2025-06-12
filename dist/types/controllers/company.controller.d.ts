@@ -15,3 +15,5 @@ export declare function getCompaniesByProductName(req: Request, res: Response): 
 export declare function loginCompany(req: Request, res: Response): Promise<void>;
 export declare function updateCompanyAvatar(req: Request, res: Response): Promise<void>;
 export declare function getPendingOrdersByCompanyId(req: Request, res: Response): Promise<void>;
+export declare function putCompanyPhoto(req: Request, res: Response): Promise<void>;
+export declare function updateCompanyPhotos(req: Request, res: Response): Promise<void>;

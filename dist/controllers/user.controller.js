@@ -31,6 +31,8 @@ exports.addFollowed = addFollowed;
 exports.UnfollowCompany = UnfollowCompany;
 exports.getFollowedCompanies = getFollowedCompanies;
 exports.getAllCompanies = getAllCompanies;
+exports.addMoney = addMoney;
+exports.PayOrder = PayOrder;
 const user_service_1 = require("../services/user.service");
 const user_1 = require("../models/user");
 const uuid_1 = require("uuid");
@@ -372,6 +374,42 @@ function getAllCompanies(req, res) {
         catch (error) {
             console.error("Error in getFollowedCompanies:", error);
             res.status(500).json({ message: "Error getting followed companies", error });
+        }
+    });
+}
+function addMoney(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const { amount } = req.body;
+            if (!amount || typeof amount !== 'number' || amount <= 0) {
+                res.status(400).json({ message: "Cantidad inválida" });
+                return;
+            }
+            const updatedUser = yield userService.addMoney(userId, amount);
+            res.status(200).json(updatedUser);
+        }
+        catch (error) {
+            console.error("Error in addMoney:", error);
+            res.status(500).json({ message: "Error adding money", error });
+        }
+    });
+}
+function PayOrder(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            const { orderId } = req.body;
+            if (!orderId) {
+                res.status(400).json({ message: "Order ID is required" });
+                return;
+            }
+            const updatedUser = yield userService.PayOrder(userId, orderId);
+            res.status(200).json(updatedUser);
+        }
+        catch (error) {
+            console.error("Error in PayOrder:", error);
+            res.status(500).json({ message: "Error paying order", error });
         }
     });
 }

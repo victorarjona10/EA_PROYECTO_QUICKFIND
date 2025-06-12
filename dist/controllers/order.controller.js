@@ -13,11 +13,13 @@ exports.postPedido = postPedido;
 exports.getPedidosByUserId = getPedidosByUserId;
 exports.getPedidoById = getPedidoById;
 exports.updatePedidoById = updatePedidoById;
+exports.updateOrderStatus = updateOrderStatus;
 exports.deletePedidoById = deletePedidoById;
 exports.deleteProductFromOrder = deleteProductFromOrder;
 exports.getAllCompanyOrders = getAllCompanyOrders;
 const order_service_1 = require("../services/order.service");
 const company_service_1 = require("../services/company.service");
+const notification_service_1 = require("../services/notification.service");
 const pedidosService = new order_service_1.PedidosService();
 const companyService = new company_service_1.CompanyService();
 function postPedido(req, res) {
@@ -25,14 +27,19 @@ function postPedido(req, res) {
         try {
             const pedido = req.body;
             if (!pedido.user_id || !pedido.products || pedido.products.length === 0) {
-                res.status(400).json({ message: "User ID, Product ID and quantity are required" });
+                res
+                    .status(400)
+                    .json({ message: "User ID, Product ID and quantity are required" });
             }
             const newPedido = yield pedidosService.postPedido(pedido);
             yield companyService.addPendingOrderToCompany(pedido.company_id.toString(), newPedido._id.toString());
+            yield notification_service_1.notificationService.sendNewOrderNotification(newPedido);
             res.status(200).json(newPedido);
         }
         catch (error) {
-            res.status(500).json({ message: "Error creating order", error: error.message });
+            res
+                .status(500)
+                .json({ message: "Error creating order", error: error.message });
         }
     });
 }
@@ -84,6 +91,25 @@ function updatePedidoById(req, res) {
         }
     });
 }
+function updateOrderStatus(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const status = req.body.status;
+            if (!id || id.length !== 24) {
+                res.status(400).json({ message: "ID inválido" });
+            }
+            const updatedPedido = yield pedidosService.updateOrderStatus(id, status);
+            if (!updatedPedido) {
+                res.status(404).json({ message: "Pedido no encontrado" });
+            }
+            res.status(200).json(updatedPedido);
+        }
+        catch (error) {
+            res.status(500).json({ message: "Error updating order", error });
+        }
+    });
+}
 function deletePedidoById(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -98,7 +124,9 @@ function deletePedidoById(req, res) {
             res.status(200).json(deletedPedido);
         }
         catch (error) {
-            res.status(500).json({ message: "Error deleting order", error: error.message });
+            res
+                .status(500)
+                .json({ message: "Error deleting order", error: error.message });
         }
     });
 }

@@ -1,7 +1,7 @@
-import {Request, Response} from 'express';
-import { IProduct} from '../models/product';
-import {ProductService} from '../services/product.service';
-import  { CompanyService }  from '../services/company.service';
+import { Request, Response } from 'express';
+import { IProduct } from '../models/product';
+import { ProductService } from '../services/product.service';
+import { CompanyService } from '../services/company.service';
 
 const productService = new ProductService();
 const companyService = new CompanyService();
@@ -33,25 +33,25 @@ const companyService = new CompanyService();
 export async function postProduct(req: Request, res: Response): Promise<void> {
     try {
 
-        try{
+        try {
             req.body as IProduct;
         } catch (error) {
             res.status(400).json({ message: "Error en el formato del producto" });
             return;
         }
-        
+
         const product = req.body as IProduct;
         if (!product.name || !product.price || !product.description) {
             res.status(400).json({ message: "Nombre, precio y descripción son obligatorios" });
             return;
         }
-        
+
         if (!product.companyId) {
             res.status(400).json({ message: "ID de la empresa es obligatorio" });
             return;
         }
         const newProduct = await productService.postProduct(product);
-        
+
         // Asociar el producto a la empresa usando el servicio directamente
         const updatedCompany = await companyService.addProductToCompany(newProduct.companyId.toString(), newProduct._id.toString());
         if (!updatedCompany) {
@@ -59,10 +59,10 @@ export async function postProduct(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        res.status(200).json({newProduct, message: "Producto creado correctamente"});
+        res.status(200).json({ newProduct, message: "Producto creado correctamente" });
         return;
 
-    } catch (error:any) {
+    } catch (error: any) {
         if (error.code === 11000) {
             res.status(403).json({ message: "El producto ya existe" });
             return;

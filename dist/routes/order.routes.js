@@ -7,6 +7,7 @@ const router = (0, express_1.Router)();
 router.post("/", session_1.checkJwt, order_controller_1.postPedido);
 router.get('/:id', session_1.checkJwt, order_controller_1.getPedidoById);
 router.put('/:id', session_1.checkJwt, order_controller_1.updatePedidoById);
+router.put('/updateStatus/:id', session_1.checkJwt, order_controller_1.updateOrderStatus);
 router.delete('/:id', session_1.checkJwt, order_controller_1.deletePedidoById);
 router.get("/AllOrdersByUser/:idUser", session_1.checkJwt, order_controller_1.getPedidosByUserId);
 router.put('/:orderId/:productId', session_1.checkJwt, order_controller_1.deleteProductFromOrder);

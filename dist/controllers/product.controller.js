@@ -22,7 +22,7 @@ function postProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             try {
-                const product = req.body;
+                req.body;
             }
             catch (error) {
                 res.status(400).json({ message: "Error en el formato del producto" });

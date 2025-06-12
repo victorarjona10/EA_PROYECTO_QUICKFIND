@@ -6,6 +6,10 @@ export interface IProduct {
     rating: number;
     description: string;
     price: number;
+    available: boolean;
+    image?: string;
+    category?: string;
+    stock?: number;
 }
 export declare const ProductModel: import("mongoose").Model<IProduct, {}, {}, {}, import("mongoose").Document<unknown, {}, IProduct, {}> & IProduct & Required<{
     _id: Schema.Types.ObjectId;

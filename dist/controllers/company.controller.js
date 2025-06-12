@@ -28,6 +28,8 @@ exports.getCompaniesByProductName = getCompaniesByProductName;
 exports.loginCompany = loginCompany;
 exports.updateCompanyAvatar = updateCompanyAvatar;
 exports.getPendingOrdersByCompanyId = getPendingOrdersByCompanyId;
+exports.putCompanyPhoto = putCompanyPhoto;
+exports.updateCompanyPhotos = updateCompanyPhotos;
 const company_service_1 = require("../services/company.service");
 const axios_1 = __importDefault(require("axios"));
 const companyService = new company_service_1.CompanyService();
@@ -277,7 +279,6 @@ function getCompanyReviews(req, res) {
                 res.status(404).json({ message: "Reseñas no encontradas" });
                 return;
             }
-            console.log("Reseñas obtenidas:", reviews);
             res.status(200).json(reviews);
         }
         catch (error) {
@@ -308,9 +309,6 @@ function addProductToCompany(req, res) {
             if (error.message === "Empresa no encontrada" ||
                 error.message === "Producto no encontrado") {
                 res.status(404).json({ message: error.message });
-            }
-            else if (error.message === "El producto ya está asociado a esta empresa") {
-                res.status(409).json({ message: error.message });
             }
             else {
                 res.status(500).json({
@@ -379,6 +377,7 @@ function updateCompanyAvatar(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { email, avatar } = req.body;
+            yield companyService.updateAvatar(avatar, email);
             res.status(200).json({ message: "Avatar actualizado correctamente" });
             return;
         }
@@ -400,11 +399,36 @@ function getPendingOrdersByCompanyId(req, res) {
                 res.status(404).json({ message: "Pedidos no encontrados" });
                 return;
             }
-            console.log("Pedidos obtenidos:", orders);
             res.status(200).json(orders);
         }
         catch (error) {
             res.status(500).json({ message: "Error getting orders", error });
+        }
+    });
+}
+function putCompanyPhoto(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const { photo } = req.body;
+            const updatedAvatar = yield companyService.putCompanyPhoto(id, photo);
+            res.status(200).json(updatedAvatar);
+        }
+        catch (error) {
+            res.status(500).json({ message: "Error updating avatar", error });
+        }
+    });
+}
+function updateCompanyPhotos(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const { photos } = req.body;
+            const updatedAvatar = yield companyService.updateCompanyPhotos(id, photos);
+            res.status(200).json(updatedAvatar);
+        }
+        catch (error) {
+            res.status(500).json({ message: "Error updating avatar", error });
         }
     });
 }

@@ -18,6 +18,11 @@ export declare class PedidosService {
     updatePedidoById(id: string, updateData: Partial<IOrder>): Promise<import("mongoose").UpdateWriteOpResult | {
         message: string;
     } | undefined>;
+    updateOrderStatus(id: string, status: string): Promise<(import("mongoose").Document<unknown, {}, IOrder, {}> & IOrder & Required<{
+        _id: import("mongoose").Schema.Types.ObjectId;
+    }> & {
+        __v: number;
+    }) | null>;
     deletePedidoById(id: string): Promise<(import("mongoose").Document<unknown, {}, IOrder, {}> & IOrder & Required<{
         _id: import("mongoose").Schema.Types.ObjectId;
     }> & {

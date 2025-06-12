@@ -155,9 +155,6 @@ class CompanyService {
                 if (!product) {
                     throw new Error("Producto no encontrado");
                 }
-                if (company.products.some((p) => p.toString() === productId)) {
-                    throw new Error("El producto ya está asociado a esta empresa");
-                }
                 company.products.push(product._id);
                 return yield company.save();
             }
@@ -229,7 +226,6 @@ class CompanyService {
                     throw new Error("Order not found");
                 }
                 company.pendingOrders.push(order._id);
-                console.log("Pending orders", company.pendingOrders);
                 return yield company.save();
             }
             catch (error) {
@@ -250,6 +246,41 @@ class CompanyService {
             }
             catch (error) {
                 console.error("Error al obtener pedidos pendientes de la empresa:", error);
+                throw error;
+            }
+        });
+    }
+    putCompanyPhoto(companyId, photo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const company = yield company_1.CompanyModel.findById(companyId);
+                if (!company) {
+                    throw new Error("Company not found");
+                }
+                if (!company.photos) {
+                    company.photos = [];
+                }
+                company.photos.push(photo);
+                return yield company.save();
+            }
+            catch (error) {
+                console.error("Error al añadir foto a la empresa:", error);
+                throw error;
+            }
+        });
+    }
+    updateCompanyPhotos(companyId, photos) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const company = yield company_1.CompanyModel.findById(companyId);
+                if (!company) {
+                    throw new Error("Company not found");
+                }
+                company.photos = photos;
+                return yield company.save();
+            }
+            catch (error) {
+                console.error("Error al actualizar fotos de la empresa:", error);
                 throw error;
             }
         });
