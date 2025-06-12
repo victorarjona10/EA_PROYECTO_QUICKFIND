@@ -7,7 +7,8 @@ import { UserModel } from "../models/user";
 import { v4 as uuidv4 } from 'uuid';
 import { generateToken } from '../utils/jwt.handle';
 import passport from "passport";
-
+import axios from "axios";
+import { GoogleProfile } from "../types/GoogleProfile";
 
 const userService = new UserService();
 
@@ -531,3 +532,44 @@ export async function getAllCompanies (req: Request, res: Response): Promise<voi
     res.status(500).json({ message: "Error getting followed companies", error });
   }
 }
+
+export const googleCallbackFromToken = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const token = req.query.token as string;
+    if (!token) {
+      res.status(400).json({ message: "Missing Google access token" });
+      return;
+    }
+
+    // 用 access token 请求用户信息
+    const googleUser = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+
+const user = await userService.findOrCreateUserFromGoogle(googleUser.data as unknown as GoogleProfile);
+
+
+
+
+    const jwt = generateToken(user._id.toString(), user.email);
+    const refreshToken = uuidv4();
+
+    // 保存 refresh token
+    await UserModel.findByIdAndUpdate(user._id, { refreshToken });
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar || ""
+      },
+      token: jwt,
+      refreshToken
+    });
+  } catch (error) {
+    console.error("Error en googleCallbackFromToken:", error);
+    res.status(500).json({ message: "Error al autenticar con Google", error });
+  }
+};

@@ -3,7 +3,7 @@ import { checkJwt } from '../middleware/session';
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 const router = Router();
-import {getAllCompanies, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
+import {getAllCompanies, googleCallbackFromToken, getFollowedCompanies, googleCallback, Google, updateAvatar, refreshAccesToken, postUser, getAllUsers, getUserById, InactivateUserById, getUserByEmail, updateUserById, getUserByName, ativateUserById, getAllActiveUsers, getUsersByFiltration, loginUser, addFollowed, UnfollowCompany } from '../controllers/user.controller'
 import passport from 'passport';
 
 
@@ -19,7 +19,8 @@ router.get('/email/:email', checkJwt,  getUserByEmail);
 router.get('/followedCompanies/:id', checkJwt,  getFollowedCompanies);
 router.get('/companies/:id', checkJwt,  getAllCompanies);
 router.put("/updateAvatar", checkJwt, updateAvatar);
-
+router.get("/auth/google/token", googleCallbackFromToken);
+router.post('/auth/google/callback/token', googleCallbackFromToken);
 router.put('/:id', checkJwt,  updateUserById);
 router.put('/InactivateFlag/:id', checkJwt,  InactivateUserById);
 router.put('/ActivateFlag/:id', checkJwt,  ativateUserById);

@@ -62,12 +62,12 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: GOOGLE_REDIRECT_URI,
+      callbackURL: `${process.env.GOOGLE_REDIRECT_URI}`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         const userService = new UserService();
-        const user = await userService.findOrCreateUserFromGoogle(profile);
+        const user = await userService.findOrCreateUserFromGoogle(profile  as any);
 
         done(null, user);
       } catch (error) {

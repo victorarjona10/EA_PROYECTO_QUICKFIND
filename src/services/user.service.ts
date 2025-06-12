@@ -5,7 +5,7 @@ import { generateToken } from "../utils/jwt.handle";
 import {encrypt} from "../utils/bcrypt.handle";
 import { v4 as uuidv4 } from "uuid";
 import { ICompany, CompanyModel } from "../models/company";
-
+import { GoogleProfile } from "../types/GoogleProfile";
 import { Profile } from "passport-google-oauth20";
 
 
@@ -161,7 +161,7 @@ export class UserService {
     return await UserModel.findOneAndUpdate({email:email}, { avatar: avatar }, { new: true });
   }
   // ============== Google 登录专用方法 ==============
-  async findOrCreateUserFromGoogle(profile: Profile): Promise<IUser> {
+ async findOrCreateUserFromGoogle(profile: GoogleProfile): Promise<IUser> {
     if (!profile.emails || !profile.emails[0]) {
       throw new Error("Google 账号未提供邮箱");
     }
