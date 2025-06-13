@@ -212,6 +212,9 @@ export class UserService {
     const company = await CompanyModel.findById(companyId);
     if (company) {
       company.followers++;
+      
+
+      company.user_Followers.push({user_id: new mongoose.Types.ObjectId(userId) })
       await company.save();
     }
     return await user.save();

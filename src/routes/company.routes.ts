@@ -19,6 +19,7 @@ import {
   putCompanyPhoto,
   updateCompanyPhotos,
   getCompaniesWithCoordenates,
+  getFollowersCompanies
 
 } from "../controllers/company.controller";
 import { checkJwt } from "../middleware/session";
@@ -33,6 +34,8 @@ router.get("/", checkJwt, getAllCompanies);
 router.get("/search/:search", getCompanyByName);
 router.get("/searchProduct/:name", getCompaniesByProductName);
 router.get("/pendingOrders/:id", checkJwt, getPendingOrdersByCompanyId);
+router.get('/followersCompanies/:id', checkJwt,  getFollowersCompanies);
+
 
 router.post("/login", loginCompany);
 router.put("/updateCompanyAvatar", checkJwt, updateCompanyAvatar);

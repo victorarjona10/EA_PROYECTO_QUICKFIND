@@ -1,4 +1,5 @@
 import {ObjectId, Schema, model} from 'mongoose';
+import mongoose from 'mongoose';
 
 
 export interface ICompany {
@@ -18,9 +19,12 @@ export interface ICompany {
   coordenates_lng: number;
   icon: string;
   photos?: string[];
-  followers: number;
   reviews?: ObjectId[];
   pendingOrders?: ObjectId[];
+  followers: number
+  user_Followers: {
+      user_id: mongoose.Types.ObjectId;
+    }[];
 }
 
 
@@ -46,9 +50,19 @@ const companySchema = new Schema<ICompany>({
     coordenates_lng: { type: Number, required: true },
     icon: {type: String, required: true},
     photos: [{type: String, required: false}],
-    followers: { type: Number, required: true, default: 0 },
     reviews: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
     pendingOrders: [{ type: Schema.Types.ObjectId, ref: "Order", required: false }],
+    followers: { type: Number, required: false, default: 0 },
+    user_Followers: [
+        {
+          user_id: {
+            type: mongoose.Types.ObjectId, 
+            ref: 'User', 
+            required: false
+          },
+        },
+      ],
+
   });
   
   export const CompanyModel = model("Company", companySchema);
