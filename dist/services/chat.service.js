@@ -22,6 +22,7 @@ class ChatService {
                 const newMessage = new chatMessage_1.default({
                     room: messageData.room,
                     author: new mongoose_1.default.Types.ObjectId(messageData.author),
+                    receiver: messageData.receiver ? new mongoose_1.default.Types.ObjectId(messageData.receiver) : null,
                     message: messageData.message,
                     time: messageData.time ? new Date(messageData.time) : new Date()
                 });

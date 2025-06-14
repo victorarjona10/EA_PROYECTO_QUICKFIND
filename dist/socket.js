@@ -66,6 +66,7 @@ function initializeChatService() {
         });
         socket.on('join_room', (roomId) => __awaiter(this, void 0, void 0, function* () {
             socket.join(roomId);
+            console.log(`Socket ${socket.id} se unió a la sala ${roomId}`);
             try {
                 const messageHistory = yield chatService.getMessagesByRoom(roomId, 50);
                 const formattedHistory = messageHistory.map(msg => ({
@@ -81,6 +82,7 @@ function initializeChatService() {
             }
         }));
         socket.on('send_message', (data) => __awaiter(this, void 0, void 0, function* () {
+            console.log(`Mensaje enviado a la sala ${data.room}:`, data.message);
             try {
                 const messageContent = data.message;
                 const chatMessage = {

@@ -87,7 +87,7 @@ export function initializeChatService() {
     // Unirse a una sala
     socket.on('join_room', async (roomId) => {
       socket.join(roomId);
-  
+      console.log(`Socket ${socket.id} se unió a la sala ${roomId}`);
       try {
         // Get message history
         const messageHistory = await chatService.getMessagesByRoom(roomId, 50);
@@ -109,6 +109,7 @@ export function initializeChatService() {
 
     // Enviar mensaje a una sala
     socket.on('send_message', async (data) => {
+      console.log(`Mensaje enviado a la sala ${data.room}:`, data.message);
       try {
         // Extract the nested messageData from the frontend format
         const messageContent = data.message;
@@ -121,7 +122,7 @@ export function initializeChatService() {
           time: messageContent.timestamp ? new Date(messageContent.timestamp).toISOString() : new Date().toISOString(),
           // Use ID from messageContent if available
           id: messageContent.id
-        };
+        };  
 
         // Save to database
         const savedMessage = await chatService.saveMessage(chatMessage);
