@@ -36,6 +36,7 @@ const notification_routes_1 = __importDefault(require("./routes/notification.rou
 const notification_service_1 = require("./services/notification.service");
 const http_1 = __importDefault(require("http"));
 const socket_1 = require("./socket");
+const feedback_routes_1 = __importDefault(require("./routes/feedback.routes"));
 dotenv_1.default.config({ path: "../.env" });
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -100,11 +101,12 @@ app.use("/api/orders", order_routes_1.default);
 app.use("/api/admins", admin_routes_1.default);
 app.use("/api/chat", chat_routes_1.default);
 app.use("/api/notifications", notification_routes_1.default);
+app.use("/api/feedback", feedback_routes_1.default);
 app.get("/api/auth/google/callback/test", (req, res) => {
     res.send("Google OAuth Succcess! 回调成功！请检查控制台日志。");
 });
 app.use((0, cors_1.default)({
-    origin: '*',
+    origin: "*",
     credentials: true,
 }));
 app.use(routeNotFound_1.routeNotFound);
