@@ -9,6 +9,7 @@ export class ChatService {
             const newMessage = new ChatMessageModel({
                 room: messageData.room,
                 author: new mongoose.Types.ObjectId(messageData.author),
+                receiver: messageData.receiver ? new mongoose.Types.ObjectId(messageData.receiver) : null,
                 message: messageData.message,
                 time: messageData.time ? new Date(messageData.time) : new Date()
             });

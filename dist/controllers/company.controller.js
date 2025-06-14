@@ -501,7 +501,6 @@ function getFollowersCompanies(req, res) {
                 res.status(404).json({ message: "Seguidores no encontrados" });
                 return;
             }
-            console.log("Followers:", followers);
             res.status(200).json(followers);
         }
         catch (error) {
