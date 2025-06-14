@@ -3,6 +3,8 @@ import { IReview, ReviewModel } from "../models/review";
 import { ProductModel } from "../models/product";
 import { encrypt, verified } from "../utils/bcrypt.handle";
 import { IOrder, OrderModel } from "../models/order";
+import { UserModel } from "../models/user";
+import mongoose from "mongoose";
 
 export class CompanyService {
   async postCompany(company: Partial<ICompany>): Promise<ICompany> {
@@ -239,7 +241,7 @@ export class CompanyService {
       throw new Error("Email o contraseña incorrectos");
     }
 
-    // Comparación directa de contraseñas
+    //Comparación directa de contraseñas
     const isPasswordValid = await verified(password, company.password);
     if (!isPasswordValid) {
       throw new Error("Email o contraseña incorrectos");
@@ -330,7 +332,20 @@ export class CompanyService {
       throw error;
     }
   }
+
+  async  getFollowersCompanies(companyId: string): Promise<any[]> {
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      throw new Error("ID de empresa inválido");
+    }
+    // Busca usuarios que sigan a la empresa
+    const followers = await UserModel.find({
+      "company_Followed.company_id": new mongoose.Types.ObjectId(companyId),
+    });
+    return followers;
+  }
+  
 }
+
 
 
 

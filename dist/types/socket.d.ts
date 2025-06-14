@@ -6,6 +6,7 @@ export interface ChatMessage {
     id?: string;
     room: string;
     author: string;
+    receiver?: string;
     message: string;
     time: string;
 }

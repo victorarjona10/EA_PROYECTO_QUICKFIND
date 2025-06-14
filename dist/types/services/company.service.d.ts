@@ -22,4 +22,5 @@ export declare class CompanyService {
     getPendingOrdersByCompanyId(companyId: string): Promise<IOrder[] | null>;
     putCompanyPhoto(companyId: string, photo: string): Promise<ICompany | null>;
     updateCompanyPhotos(companyId: string, photos: string[]): Promise<ICompany | null>;
+    getFollowersCompanies(companyId: string): Promise<any[]>;
 }

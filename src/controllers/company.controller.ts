@@ -434,10 +434,10 @@ export async function loginCompany(req: Request, res: Response): Promise<void> {
       return;
     }
     const company = await companyService.loginCompany(email, password);
-    if (!company) {
-      res.status(401).json({ message: "Email o contraseña incorrectos" });
-      return;
-    }
+    // if (!company) {
+    //   res.status(401).json({ message: "Email o contraseña incorrectos" });
+    //   return;
+    // }
     res.status(200).json(company);
   } catch (error) {
     res.status(500).json({ message: "Error al iniciar sesión", error });
@@ -504,6 +504,29 @@ export async function updateCompanyPhotos(
   } catch (error) {
     res.status(500).json({ message: "Error updating avatar", error });
   }
+}
+
+export async function getFollowersCompanies(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido" });
+      return;
+    }
+    const followers = await companyService.getFollowersCompanies(id);
+    if (!followers) {
+      res.status(404).json({ message: "Seguidores no encontrados" });
+      return;
+    }
+    res.status(200).json(followers);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting followers", error });
+  }
+
+  
 }
 
 

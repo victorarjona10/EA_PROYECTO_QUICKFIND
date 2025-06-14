@@ -31,6 +31,7 @@ exports.updateCompanyAvatar = updateCompanyAvatar;
 exports.getPendingOrdersByCompanyId = getPendingOrdersByCompanyId;
 exports.putCompanyPhoto = putCompanyPhoto;
 exports.updateCompanyPhotos = updateCompanyPhotos;
+exports.getFollowersCompanies = getFollowersCompanies;
 const company_service_1 = require("../services/company.service");
 const axios_1 = __importDefault(require("axios"));
 const companyService = new company_service_1.CompanyService();
@@ -417,10 +418,6 @@ function loginCompany(req, res) {
                 return;
             }
             const company = yield companyService.loginCompany(email, password);
-            if (!company) {
-                res.status(401).json({ message: "Email o contraseña incorrectos" });
-                return;
-            }
             res.status(200).json(company);
         }
         catch (error) {
@@ -484,6 +481,26 @@ function updateCompanyPhotos(req, res) {
         }
         catch (error) {
             res.status(500).json({ message: "Error updating avatar", error });
+        }
+    });
+}
+function getFollowersCompanies(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            if (!id || id.length !== 24) {
+                res.status(400).json({ message: "ID inválido" });
+                return;
+            }
+            const followers = yield companyService.getFollowersCompanies(id);
+            if (!followers) {
+                res.status(404).json({ message: "Seguidores no encontrados" });
+                return;
+            }
+            res.status(200).json(followers);
+        }
+        catch (error) {
+            res.status(500).json({ message: "Error getting followers", error });
         }
     });
 }

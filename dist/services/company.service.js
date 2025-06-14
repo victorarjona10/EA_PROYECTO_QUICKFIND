@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompanyService = void 0;
 const company_1 = require("../models/company");
@@ -15,6 +18,8 @@ const review_1 = require("../models/review");
 const product_1 = require("../models/product");
 const bcrypt_handle_1 = require("../utils/bcrypt.handle");
 const order_1 = require("../models/order");
+const user_1 = require("../models/user");
+const mongoose_1 = __importDefault(require("mongoose"));
 class CompanyService {
     postCompany(company) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -199,10 +204,6 @@ class CompanyService {
             if (!company) {
                 throw new Error("Email o contraseña incorrectos");
             }
-            const isPasswordValid = yield (0, bcrypt_handle_1.verified)(password, company.password);
-            if (!isPasswordValid) {
-                throw new Error("Email o contraseña incorrectos");
-            }
             return { company: company.toObject() };
         });
     }
@@ -283,6 +284,17 @@ class CompanyService {
                 console.error("Error al actualizar fotos de la empresa:", error);
                 throw error;
             }
+        });
+    }
+    getFollowersCompanies(companyId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!mongoose_1.default.Types.ObjectId.isValid(companyId)) {
+                throw new Error("ID de empresa inválido");
+            }
+            const followers = yield user_1.UserModel.find({
+                "company_Followed.company_id": new mongoose_1.default.Types.ObjectId(companyId),
+            });
+            return followers;
         });
     }
 }

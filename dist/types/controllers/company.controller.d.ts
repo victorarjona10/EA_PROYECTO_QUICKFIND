@@ -18,3 +18,4 @@ export declare function updateCompanyAvatar(req: Request, res: Response): Promis
 export declare function getPendingOrdersByCompanyId(req: Request, res: Response): Promise<void>;
 export declare function putCompanyPhoto(req: Request, res: Response): Promise<void>;
 export declare function updateCompanyPhotos(req: Request, res: Response): Promise<void>;
+export declare function getFollowersCompanies(req: Request, res: Response): Promise<void>;

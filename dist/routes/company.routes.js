@@ -4,6 +4,7 @@ const express_1 = require("express");
 const company_controller_1 = require("../controllers/company.controller");
 const session_1 = require("../middleware/session");
 const router = (0, express_1.Router)();
+router.get("/followersCompanies/:id", session_1.checkJwt, company_controller_1.getFollowersCompanies);
 router.get("/coordinatescompanies/:companyName", session_1.checkJwt, company_controller_1.getCompaniesWithCoordenates);
 router.get("/companies", session_1.checkJwt, company_controller_1.getCompanies);
 router.get("/", session_1.checkJwt, company_controller_1.getAllCompanies);

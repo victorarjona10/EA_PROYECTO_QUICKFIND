@@ -43,6 +43,7 @@ export interface ChatMessage {
   id?: string
   room: string;
   author: string;
+  receiver?: string; // Opcional si el mensaje es privado
   message: string;
   time: string;
 }
@@ -63,7 +64,6 @@ export function initializeChatService() {
 
   // Configurar eventos de chat en el namespace
   chatNamespace.on('connection', (socket) => {
-
     // Verificación JWT para los sockets de chat
     socket.use(([_event, ..._args], next) => {
       const token = socket.handshake.auth.token;
@@ -87,7 +87,7 @@ export function initializeChatService() {
     // Unirse a una sala
     socket.on('join_room', async (roomId) => {
       socket.join(roomId);
-
+  
       try {
         // Get message history
         const messageHistory = await chatService.getMessagesByRoom(roomId, 50);
@@ -112,11 +112,11 @@ export function initializeChatService() {
       try {
         // Extract the nested messageData from the frontend format
         const messageContent = data.message;
-
         // Create a properly formatted message object for our database
         const chatMessage: ChatMessage = {
           room: data.room,
-          author: socket.handshake.auth.userId || messageContent.sender,
+          author:  messageContent.sender,
+          receiver: messageContent.receiver,
           message: messageContent.text || messageContent,  // Handle both object and string formats
           time: messageContent.timestamp ? new Date(messageContent.timestamp).toISOString() : new Date().toISOString(),
           // Use ID from messageContent if available
