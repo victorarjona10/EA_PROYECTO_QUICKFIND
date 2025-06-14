@@ -1,4 +1,5 @@
 import { ObjectId, Schema } from 'mongoose';
+import mongoose from 'mongoose';
 export interface ICompany {
     _id: ObjectId;
     ownerId: ObjectId;
@@ -16,19 +17,22 @@ export interface ICompany {
     coordenates_lng: number;
     icon: string;
     photos?: string[];
-    followers: number;
     reviews?: ObjectId[];
     pendingOrders?: ObjectId[];
+    followers: number;
+    user_Followers: {
+        user_id: mongoose.Types.ObjectId;
+    }[];
 }
-export declare const CompanyModel: import("mongoose").Model<ICompany, {}, {}, {}, import("mongoose").Document<unknown, {}, ICompany, {}> & ICompany & Required<{
+export declare const CompanyModel: mongoose.Model<ICompany, {}, {}, {}, mongoose.Document<unknown, {}, ICompany, {}> & ICompany & Required<{
     _id: Schema.Types.ObjectId;
 }> & {
     __v: number;
-}, Schema<ICompany, import("mongoose").Model<ICompany, any, any, any, import("mongoose").Document<unknown, any, ICompany, any> & ICompany & Required<{
+}, Schema<ICompany, mongoose.Model<ICompany, any, any, any, mongoose.Document<unknown, any, ICompany, any> & ICompany & Required<{
     _id: Schema.Types.ObjectId;
 }> & {
     __v: number;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, ICompany, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<ICompany>, {}> & import("mongoose").FlatRecord<ICompany> & Required<{
+}, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, ICompany, mongoose.Document<unknown, {}, mongoose.FlatRecord<ICompany>, {}> & mongoose.FlatRecord<ICompany> & Required<{
     _id: Schema.Types.ObjectId;
 }> & {
     __v: number;

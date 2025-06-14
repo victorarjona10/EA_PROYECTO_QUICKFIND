@@ -40,7 +40,9 @@ export async function getNotifications(
 
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
-    const onlyUnread = req.query.unread === "true";
+
+    // Por defecto, solo no leídas
+    const onlyUnread = req.query.read !== "all";
 
     const notifications = await notificationService.getUserNotifications(
       userId,
@@ -129,4 +131,25 @@ export async function clearAllNotifications(
 ): Promise<void> {
   // Este método podría implementarse en el servicio de notificaciones
   res.status(501).json({ message: "Not implemented yet" });
+}
+
+export async function readNotifications(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    // @ts-ignore - Asumimos que el middleware de autenticación añade user al objeto req
+    const userId = req.user.id;
+    if (!userId) {
+      res.status(400).json({ message: "User ID is required" });
+      return;
+    }
+    await notificationService.readNotifications(userId);
+    res.status(200).json({ message: "All notifications marked as read" });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error marking notifications as read",
+      error: error.message,
+    });
+  }
 }

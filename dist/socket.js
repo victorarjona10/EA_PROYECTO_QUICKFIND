@@ -46,7 +46,6 @@ function initializeChatService() {
     }
     const chatNamespace = io.of('/chat');
     chatNamespace.on('connection', (socket) => {
-        console.log(`Nuevo cliente conectado al chat: ${socket.id}`);
         socket.use(([_event, ..._args], next) => {
             const token = socket.handshake.auth.token;
             if (!token)
@@ -67,7 +66,6 @@ function initializeChatService() {
         });
         socket.on('join_room', (roomId) => __awaiter(this, void 0, void 0, function* () {
             socket.join(roomId);
-            console.log(`Socket ${socket.id} se unió a la sala ${roomId}`);
             try {
                 const messageHistory = yield chatService.getMessagesByRoom(roomId, 50);
                 const formattedHistory = messageHistory.map(msg => ({
@@ -85,7 +83,6 @@ function initializeChatService() {
         socket.on('send_message', (data) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const messageContent = data.message;
-                console.log('Received message:', messageContent);
                 const chatMessage = {
                     room: data.room,
                     author: messageContent.sender,

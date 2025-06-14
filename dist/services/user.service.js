@@ -189,6 +189,7 @@ class UserService {
             const company = yield company_1.CompanyModel.findById(companyId);
             if (company) {
                 company.followers++;
+                company.user_Followers.push({ user_id: new mongoose_1.default.Types.ObjectId(userId) });
                 yield company.save();
             }
             return yield user.save();

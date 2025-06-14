@@ -33,7 +33,7 @@ function postPedido(req, res) {
             }
             const newPedido = yield pedidosService.postPedido(pedido);
             yield companyService.addPendingOrderToCompany(pedido.company_id.toString(), newPedido._id.toString());
-            yield notification_service_1.notificationService.sendNewOrderNotification(newPedido);
+            yield notification_service_1.notificationService.sendNotification(newPedido, "new_order");
             res.status(200).json(newPedido);
         }
         catch (error) {
@@ -98,11 +98,16 @@ function updateOrderStatus(req, res) {
             const status = req.body.status;
             if (!id || id.length !== 24) {
                 res.status(400).json({ message: "ID inválido" });
+                return;
             }
             const updatedPedido = yield pedidosService.updateOrderStatus(id, status);
             if (!updatedPedido) {
                 res.status(404).json({ message: "Pedido no encontrado" });
+                return;
             }
+            const ownerId = req.user.id;
+            console.log("ownerId:", ownerId, "tipo:", typeof ownerId);
+            yield notification_service_1.notificationService.sendNotification(updatedPedido, "order_status_update", status);
             res.status(200).json(updatedPedido);
         }
         catch (error) {

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getNotifications = getNotifications;
 exports.markNotificationAsRead = markNotificationAsRead;
 exports.clearAllNotifications = clearAllNotifications;
+exports.readNotifications = readNotifications;
 const notification_service_1 = require("../services/notification.service");
 const mongoose_1 = __importDefault(require("mongoose"));
 function getNotifications(req, res) {
@@ -23,7 +24,7 @@ function getNotifications(req, res) {
             const userId = req.user.id;
             const limit = req.query.limit ? parseInt(req.query.limit) : 20;
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-            const onlyUnread = req.query.unread === "true";
+            const onlyUnread = req.query.read !== "all";
             const notifications = yield notification_service_1.notificationService.getUserNotifications(userId, limit, offset, onlyUnread);
             res.status(200).json(notifications);
         }
@@ -64,6 +65,25 @@ function markNotificationAsRead(req, res) {
 function clearAllNotifications(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         res.status(501).json({ message: "Not implemented yet" });
+    });
+}
+function readNotifications(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.user.id;
+            if (!userId) {
+                res.status(400).json({ message: "User ID is required" });
+                return;
+            }
+            yield notification_service_1.notificationService.readNotifications(userId);
+            res.status(200).json({ message: "All notifications marked as read" });
+        }
+        catch (error) {
+            res.status(500).json({
+                message: "Error marking notifications as read",
+                error: error.message,
+            });
+        }
     });
 }
 //# sourceMappingURL=notification.controller.js.map

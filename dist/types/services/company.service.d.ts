@@ -1,6 +1,7 @@
 import { ICompany } from "../models/company";
 import { IReview } from "../models/review";
 import { IOrder } from "../models/order";
+import { IUser } from "../models/user";
 export declare class CompanyService {
     postCompany(company: Partial<ICompany>): Promise<ICompany>;
     getAllCompanies(): Promise<ICompany[]>;
@@ -22,5 +23,5 @@ export declare class CompanyService {
     getPendingOrdersByCompanyId(companyId: string): Promise<IOrder[] | null>;
     putCompanyPhoto(companyId: string, photo: string): Promise<ICompany | null>;
     updateCompanyPhotos(companyId: string, photos: string[]): Promise<ICompany | null>;
-    getFollowersCompanies(companyId: string): Promise<any[]>;
+    getFollowersCompanies(CompanyId: string): Promise<IUser[]>;
 }

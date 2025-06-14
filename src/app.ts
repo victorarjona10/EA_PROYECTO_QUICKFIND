@@ -21,6 +21,7 @@ import notificationRoutes from "./routes/notification.routes";
 import { notificationService } from "./services/notification.service";
 import http from "http";
 import { initializeSocketIO, initializeChatService } from "./socket";
+import feedbackRoutes from "./routes/feedback.routes";
 
 dotenv.config({ path: "../.env" });
 // Removed duplicate import of express
@@ -112,7 +113,7 @@ app.use("/api/orders", pedidosRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
-
+app.use("/api/feedback", feedbackRoutes);
 // ================= Google Test登录回调测试路由 =================
 app.get("/api/auth/google/callback/test", (req: Request, res: Response) => {
   res.send("Google OAuth Succcess! 回调成功！请检查控制台日志。");
@@ -120,14 +121,14 @@ app.get("/api/auth/google/callback/test", (req: Request, res: Response) => {
 
 app.use(
   cors({
-    origin: '*',
+    origin: "*",
     credentials: true,
   })
 );
 
 app.use(routeNotFound); //Middleware para informar de una ruta inexistente fuera de /users , /products ,etc.
 
-server.listen(PORT, "0.0.0.0" , () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running at  http://localhost:${PORT}`);
   console.log(`Swagger running at http://localhost:${PORT}/api-docs/`);
 });

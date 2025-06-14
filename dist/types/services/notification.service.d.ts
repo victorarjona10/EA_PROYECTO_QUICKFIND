@@ -10,7 +10,7 @@ export declare class NotificationService {
     initializeListeners(): void;
     private setupSocketListeners;
     private sendPendingNotifications;
-    sendNewOrderNotification(order: IOrder): Promise<void>;
+    sendNotification(order: IOrder, type: "new_order" | "order_status_update", newStatus?: string): Promise<void>;
     markAsRead(notificationId: string, userId: string): Promise<boolean>;
     getUserNotifications(userId: string, limit?: number, offset?: number, onlyUnread?: boolean): Promise<(mongoose.Document<unknown, {}, INotification, {}> & INotification & Required<{
         _id: mongoose.Schema.Types.ObjectId;
@@ -18,5 +18,6 @@ export declare class NotificationService {
         __v: number;
     })[]>;
     deleteOldNotifications(daysOld?: number): Promise<number>;
+    readNotifications(userId: string): Promise<void>;
 }
 export declare const notificationService: NotificationService;

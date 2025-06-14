@@ -18,6 +18,7 @@ const user_service_1 = require("./user.service");
 const company_service_1 = require("./company.service");
 const notification_1 = require("../models/notification");
 const mongoose_1 = __importDefault(require("mongoose"));
+const user_1 = require("../models/user");
 class NotificationService {
     constructor() {
         this.userService = new user_service_1.UserService();
@@ -93,7 +94,7 @@ class NotificationService {
             }
         });
     }
-    sendNewOrderNotification(order) {
+    sendNotification(order, type, newStatus) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const company = yield this.companyService.getCompanyById(order.company_id.toString());
@@ -101,50 +102,75 @@ class NotificationService {
                     console.error("Company not found for notification");
                     return;
                 }
-                const user = yield this.userService.getUserById(order.user_id.toString());
+                const user = yield user_1.UserModel.findById(order.user_id).lean();
                 if (!user) {
                     console.error("User not found for notification");
                     return;
                 }
                 const ownerId = company.ownerId.toString();
-                const notificationData = {
-                    type: "new_order",
-                    order: {
-                        id: order._id.toString(),
-                        status: order.status,
-                        date: order.orderDate,
-                    },
-                    company: {
-                        id: company._id.toString(),
-                        name: company.name,
-                    },
-                    user: {
-                        id: user._id.toString(),
-                        name: user.name,
-                    },
-                    message: `Nuevo pedido de ${user.name} para ${company.name}`,
-                };
+                const userIdStr = user._id.toString();
+                console.log("IDs extraídos:", { ownerId, userIdStr });
+                let message;
+                let senderId;
+                let recipientId;
+                if (type === "new_order") {
+                    recipientId = ownerId;
+                    senderId = userIdStr;
+                    message = `Nuevo pedido de ${user.name} para ${company.name}`;
+                }
+                else {
+                    recipientId = userIdStr;
+                    senderId = ownerId;
+                    if (newStatus === "Procesado") {
+                        message = `Tu pedido en ${company.name} ha sido procesado correctamente.`;
+                    }
+                    else if (newStatus === "Cancelado") {
+                        message = `Tu pedido en ${company.name} ha sido cancelado.`;
+                    }
+                    else {
+                        message = `El estado de tu pedido en ${company.name} ha cambiado a: ${newStatus || "actualizado"}`;
+                    }
+                }
                 const notification = new notification_1.NotificationModel({
-                    recipient_id: new mongoose_1.default.Types.ObjectId(ownerId),
-                    sender_id: new mongoose_1.default.Types.ObjectId(order.user_id.toString()),
+                    recipient_id: new mongoose_1.default.Types.ObjectId(recipientId),
+                    sender_id: new mongoose_1.default.Types.ObjectId(senderId),
                     related_id: new mongoose_1.default.Types.ObjectId(order._id.toString()),
-                    type: "new_order",
-                    message: `Nuevo pedido de ${user.name} para ${company.name}`,
-                    data: notificationData,
+                    type,
+                    message,
                     read: false,
+                    created_at: new Date(),
                 });
                 yield notification.save();
                 console.log(`Notification saved to database with ID: ${notification._id}`);
-                if (this.userSockets.has(ownerId)) {
-                    const socketIds = this.userSockets.get(ownerId) || [];
+                if (this.userSockets.has(recipientId)) {
+                    const socketIds = this.userSockets.get(recipientId) || [];
                     for (const socketId of socketIds) {
                         const io = (0, socket_1.getIO)();
-                        io.to(socketId).emit("notification", Object.assign(Object.assign({ id: notification._id.toString() }, notificationData), { created_at: notification.created_at, read: false }));
-                        console.log(`Notification sent to socket ${socketId} for user ${ownerId}`);
+                        const socketNotification = {
+                            id: notification._id.toString(),
+                            type: notification.type,
+                            message: notification.message,
+                            created_at: notification.created_at,
+                            read: false,
+                            order: {
+                                id: order._id.toString(),
+                                status: type === "new_order" ? order.status : newStatus,
+                            },
+                            company: {
+                                id: company._id.toString(),
+                                name: company.name,
+                            },
+                            user: {
+                                id: userIdStr,
+                                name: user.name,
+                            },
+                        };
+                        io.to(socketId).emit("notification", socketNotification);
+                        console.log(`Notification sent to socket ${socketId} for recipient ${recipientId}`);
                     }
                 }
                 else {
-                    console.log(`Owner ${ownerId} not connected, notification stored for later delivery`);
+                    console.log(`Recipient ${recipientId} not connected, notification stored for later delivery`);
                 }
             }
             catch (error) {
@@ -201,6 +227,11 @@ class NotificationService {
                 console.error("Error deleting old notifications:", error);
                 return 0;
             }
+        });
+    }
+    readNotifications(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield notification_1.NotificationModel.updateMany({ recipient_id: new mongoose_1.default.Types.ObjectId(userId), read: false }, { $set: { read: true } });
         });
     }
 }

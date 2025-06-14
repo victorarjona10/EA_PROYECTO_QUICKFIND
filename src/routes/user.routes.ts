@@ -24,9 +24,11 @@ router.get('/followingUsers/:id', checkJwt,  getFollowingUsers);
 router.get('/companies/:id', checkJwt,  getAllCompanies);
 router.put("/updateAvatar", checkJwt, updateAvatar);
 
+
 router.put('/:id', checkJwt,  updateUserById);
 router.put('/InactivateFlag/:id', checkJwt,  InactivateUserById);
 router.put('/ActivateFlag/:id', checkJwt,  ativateUserById);
+
 
 router.post("/login", loginUser);
 
