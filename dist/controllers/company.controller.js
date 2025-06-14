@@ -418,6 +418,10 @@ function loginCompany(req, res) {
                 return;
             }
             const company = yield companyService.loginCompany(email, password);
+            if (!company) {
+                res.status(401).json({ message: "Email o contraseña incorrectos" });
+                return;
+            }
             res.status(200).json(company);
         }
         catch (error) {
@@ -497,6 +501,7 @@ function getFollowersCompanies(req, res) {
                 res.status(404).json({ message: "Seguidores no encontrados" });
                 return;
             }
+            console.log("Followers:", followers);
             res.status(200).json(followers);
         }
         catch (error) {

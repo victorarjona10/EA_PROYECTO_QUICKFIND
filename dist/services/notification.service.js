@@ -36,10 +36,8 @@ class NotificationService {
         try {
             const io = (0, socket_1.getIO)();
             io.on("connection", (socket) => {
-                console.log(`New client connected: ${socket.id}`);
                 socket.on("authenticate", (userId) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
-                    console.log(`User ${userId} authenticated on socket ${socket.id}`);
                     if (!this.userSockets.has(userId)) {
                         this.userSockets.set(userId, []);
                     }
@@ -48,7 +46,6 @@ class NotificationService {
                     yield this.sendPendingNotifications(userId, socket.id);
                 }));
                 socket.on("disconnect", () => {
-                    console.log(`Client disconnected: ${socket.id}`);
                     this.userSockets.forEach((socketIds, userId) => {
                         const updatedSocketIds = socketIds.filter((id) => id !== socket.id);
                         if (updatedSocketIds.length === 0) {
@@ -60,7 +57,6 @@ class NotificationService {
                     });
                 });
             });
-            console.log("Socket listeners initialized successfully");
         }
         catch (error) {
             console.error("Failed to initialize socket listeners:", error);
@@ -76,7 +72,6 @@ class NotificationService {
                     .sort({ created_at: -1 })
                     .limit(10);
                 if (notifications.length > 0) {
-                    console.log(`Sending ${notifications.length} pending notifications to user ${userId}`);
                     for (const notification of notifications) {
                         const io = (0, socket_1.getIO)();
                         io.to(socketId).emit("notification", {
@@ -109,7 +104,6 @@ class NotificationService {
                 }
                 const ownerId = company.ownerId.toString();
                 const userIdStr = user._id.toString();
-                console.log("IDs extraídos:", { ownerId, userIdStr });
                 let message;
                 let senderId;
                 let recipientId;
@@ -141,7 +135,6 @@ class NotificationService {
                     created_at: new Date(),
                 });
                 yield notification.save();
-                console.log(`Notification saved to database with ID: ${notification._id}`);
                 if (this.userSockets.has(recipientId)) {
                     const socketIds = this.userSockets.get(recipientId) || [];
                     for (const socketId of socketIds) {
@@ -166,11 +159,7 @@ class NotificationService {
                             },
                         };
                         io.to(socketId).emit("notification", socketNotification);
-                        console.log(`Notification sent to socket ${socketId} for recipient ${recipientId}`);
                     }
-                }
-                else {
-                    console.log(`Recipient ${recipientId} not connected, notification stored for later delivery`);
                 }
             }
             catch (error) {
@@ -220,7 +209,6 @@ class NotificationService {
                 const result = yield notification_1.NotificationModel.deleteMany({
                     created_at: { $lt: cutoffDate },
                 });
-                console.log(`Deleted ${result.deletedCount} old notifications`);
                 return result.deletedCount;
             }
             catch (error) {

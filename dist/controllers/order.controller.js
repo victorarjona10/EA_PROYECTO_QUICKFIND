@@ -105,8 +105,6 @@ function updateOrderStatus(req, res) {
                 res.status(404).json({ message: "Pedido no encontrado" });
                 return;
             }
-            const ownerId = req.user.id;
-            console.log("ownerId:", ownerId, "tipo:", typeof ownerId);
             yield notification_service_1.notificationService.sendNotification(updatedPedido, "order_status_update", status);
             res.status(200).json(updatedPedido);
         }

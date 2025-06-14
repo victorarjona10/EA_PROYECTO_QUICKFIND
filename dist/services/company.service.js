@@ -18,6 +18,7 @@ const review_1 = require("../models/review");
 const product_1 = require("../models/product");
 const bcrypt_handle_1 = require("../utils/bcrypt.handle");
 const order_1 = require("../models/order");
+const user_1 = require("../models/user");
 const mongoose_1 = __importDefault(require("mongoose"));
 class CompanyService {
     postCompany(company) {
@@ -203,6 +204,7 @@ class CompanyService {
             if (!company) {
                 throw new Error("Email o contraseña incorrectos");
             }
+            const isPasswordValid = yield (0, bcrypt_handle_1.verified)(password, company.password);
             return { company: company.toObject() };
         });
     }
@@ -285,22 +287,15 @@ class CompanyService {
             }
         });
     }
-    getFollowersCompanies(CompanyId) {
+    getFollowersCompanies(companyId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const Company = yield company_1.CompanyModel.findById(CompanyId).populate("user_Followers.user_id").exec();
-            if (!Company) {
-                throw new Error("Com  pañia no encontrada");
+            if (!mongoose_1.default.Types.ObjectId.isValid(companyId)) {
+                throw new Error("ID de empresa inválido");
             }
-            console.log("user_Followers:", Company.user_Followers);
-            return Company.user_Followers
-                .filter(follower => follower.user_id && !(follower.user_id instanceof mongoose_1.default.Types.ObjectId))
-                .map((follower) => {
-                if (!follower.user_id || follower.user_id instanceof mongoose_1.default.Types.ObjectId) {
-                    console.error("Populate failed for follower:", follower);
-                    throw new Error("user data is not populated");
-                }
-                return follower.user_id;
+            const users = yield user_1.UserModel.find({
+                "company_Followed.company_id": new mongoose_1.default.Types.ObjectId(companyId),
             });
+            return users;
         });
     }
 }

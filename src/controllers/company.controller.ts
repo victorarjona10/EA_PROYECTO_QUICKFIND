@@ -434,10 +434,10 @@ export async function loginCompany(req: Request, res: Response): Promise<void> {
       return;
     }
     const company = await companyService.loginCompany(email, password);
-    // if (!company) {
-    //   res.status(401).json({ message: "Email o contraseña incorrectos" });
-    //   return;
-    // }
+    if (!company) {
+      res.status(401).json({ message: "Email o contraseña incorrectos" });
+      return;
+    }
     res.status(200).json(company);
   } catch (error) {
     res.status(500).json({ message: "Error al iniciar sesión", error });

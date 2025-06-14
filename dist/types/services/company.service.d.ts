@@ -2,6 +2,7 @@ import { ICompany } from "../models/company";
 import { IReview } from "../models/review";
 import { IOrder } from "../models/order";
 import { IUser } from "../models/user";
+import mongoose from "mongoose";
 export declare class CompanyService {
     postCompany(company: Partial<ICompany>): Promise<ICompany>;
     getAllCompanies(): Promise<ICompany[]>;
@@ -23,5 +24,9 @@ export declare class CompanyService {
     getPendingOrdersByCompanyId(companyId: string): Promise<IOrder[] | null>;
     putCompanyPhoto(companyId: string, photo: string): Promise<ICompany | null>;
     updateCompanyPhotos(companyId: string, photos: string[]): Promise<ICompany | null>;
-    getFollowersCompanies(CompanyId: string): Promise<IUser[]>;
+    getFollowersCompanies(companyId: string): Promise<(mongoose.Document<unknown, {}, IUser, {}> & IUser & Required<{
+        _id: mongoose.Schema.Types.ObjectId;
+    }> & {
+        __v: number;
+    })[]>;
 }
