@@ -4,6 +4,7 @@ import { UserService } from "./user.service";
 import { CompanyService } from "./company.service";
 import { NotificationModel, INotification } from "../models/notification";
 import mongoose from "mongoose";
+import { UserModel } from "../models/user";
 
 export class NotificationService {
   private userService = new UserService();
@@ -98,7 +99,11 @@ export class NotificationService {
   }
 
   // Método para enviar notificación de nuevo pedido
-  async sendNewOrderNotification(order: IOrder) {
+  async sendNotification(
+    order: IOrder,
+    type: "new_order" | "order_status_update",
+    newStatus?: string
+  ) {
     try {
       // Obtenemos la empresa
       const company = await this.companyService.getCompanyById(
@@ -110,7 +115,8 @@ export class NotificationService {
       }
 
       // Obtenemos el usuario que realizó el pedido
-      const user = await this.userService.getUserById(order.user_id.toString());
+      const user = await UserModel.findById(order.user_id).lean();
+
       if (!user) {
         console.error("User not found for notification");
         return;
@@ -118,35 +124,42 @@ export class NotificationService {
 
       // Obtenemos el propietario de la empresa
       const ownerId = company.ownerId.toString();
+      const userIdStr = user._id.toString();
 
-      // Preparamos los datos de la notificación
-      const notificationData = {
-        type: "new_order",
-        order: {
-          id: order._id.toString(),
-          status: order.status,
-          date: order.orderDate,
-        },
-        company: {
-          id: company._id.toString(),
-          name: company.name,
-        },
-        user: {
-          id: user._id.toString(),
-          name: user.name,
-        },
-        message: `Nuevo pedido de ${user.name} para ${company.name}`,
-      };
+      console.log("IDs extraídos:", { ownerId, userIdStr });
 
-      // Crear la notificación en la base de datos
+      let message: string;
+      let senderId: string;
+      let recipientId: string;
+      // Diferencia entre notificación nueva y actualización
+      if (type === "new_order") {
+        recipientId = ownerId; // El dueño de la empresa recibe
+        senderId = userIdStr; // El usuario envía
+        // Notificación de nuevo pedido: del usuario a la empresa
+        message = `Nuevo pedido de ${user.name} para ${company.name}`;
+      } else {
+        // Notificación de cambio de estado: de la empresa al usuario
+        recipientId = userIdStr; // El dueño de la empresa recibe
+        senderId = ownerId; // El usuario envía
+        if (newStatus === "Procesado") {
+          message = `Tu pedido en ${company.name} ha sido procesado correctamente.`;
+        } else if (newStatus === "Cancelado") {
+          message = `Tu pedido en ${company.name} ha sido cancelado.`;
+        } else {
+          message = `El estado de tu pedido en ${company.name} ha cambiado a: ${
+            newStatus || "actualizado"
+          }`;
+        }
+      }
+
       const notification = new NotificationModel({
-        recipient_id: new mongoose.Types.ObjectId(ownerId),
-        sender_id: new mongoose.Types.ObjectId(order.user_id.toString()),
+        recipient_id: new mongoose.Types.ObjectId(recipientId),
+        sender_id: new mongoose.Types.ObjectId(senderId),
         related_id: new mongoose.Types.ObjectId(order._id.toString()),
-        type: "new_order",
-        message: `Nuevo pedido de ${user.name} para ${company.name}`,
-        data: notificationData,
+        type,
+        message,
         read: false,
+        created_at: new Date(),
       });
 
       // Guardar en base de datos
@@ -154,25 +167,41 @@ export class NotificationService {
       console.log(
         `Notification saved to database with ID: ${notification._id}`
       );
-
-      // Enviamos la notificación si el propietario está conectado
-      if (this.userSockets.has(ownerId)) {
-        const socketIds = this.userSockets.get(ownerId) || [];
+      // Enviamos la notificación si el destinatario está conectado
+      if (this.userSockets.has(recipientId)) {
+        const socketIds = this.userSockets.get(recipientId) || [];
         for (const socketId of socketIds) {
           const io = getIO();
-          io.to(socketId).emit("notification", {
+
+          // Preparar objeto para envío por socket
+          const socketNotification = {
             id: notification._id.toString(),
-            ...notificationData,
+            type: notification.type,
+            message: notification.message,
             created_at: notification.created_at,
             read: false,
-          });
+            order: {
+              id: order._id.toString(),
+              status: type === "new_order" ? order.status : newStatus,
+            },
+            company: {
+              id: company._id.toString(),
+              name: company.name,
+            },
+            user: {
+              id: userIdStr,
+              name: user.name,
+            },
+          };
+
+          io.to(socketId).emit("notification", socketNotification);
           console.log(
-            `Notification sent to socket ${socketId} for user ${ownerId}`
+            `Notification sent to socket ${socketId} for recipient ${recipientId}`
           );
         }
       } else {
         console.log(
-          `Owner ${ownerId} not connected, notification stored for later delivery`
+          `Recipient ${recipientId} not connected, notification stored for later delivery`
         );
       }
     } catch (error) {
@@ -242,19 +271,13 @@ export class NotificationService {
     }
   }
 
-async readNotifications(userId: string): Promise<void> {
-  try {
+  // src/services/notification.service.ts
+  async readNotifications(userId: string): Promise<void> {
     await NotificationModel.updateMany(
       { recipient_id: new mongoose.Types.ObjectId(userId), read: false },
       { $set: { read: true } }
     );
-  } catch (error) {
-    console.error('Error updating notifications:', error);
-    throw new Error('Failed to update notifications');
   }
-}
-
-
 }
 
 // Exportamos una instancia para uso global

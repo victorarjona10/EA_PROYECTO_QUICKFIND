@@ -44,7 +44,7 @@ export async function postPedido(req: Request, res: Response): Promise<void> {
       newPedido._id.toString()
     );
     // Enviar notificación en tiempo real
-    await notificationService.sendNewOrderNotification(newPedido);
+    await notificationService.sendNotification(newPedido, "new_order");
     res.status(200).json(newPedido);
   } catch (error: any) {
     res
@@ -196,18 +196,33 @@ export async function updateOrderStatus(
 
     if (!id || id.length !== 24) {
       res.status(400).json({ message: "ID inválido" });
+      return;
     }
 
     const updatedPedido = await pedidosService.updateOrderStatus(id, status);
     if (!updatedPedido) {
       res.status(404).json({ message: "Pedido no encontrado" });
+      return;
     }
+
+    // AQUÍ ESTÁ EL PROBLEMA
+    // @ts-ignore
+    const ownerId = req.user.id; // ASEGÚRATE DE USAR .id, NO EL OBJETO COMPLETO
+
+    // Si necesitas depurar
+    console.log("ownerId:", ownerId, "tipo:", typeof ownerId);
+
+    await notificationService.sendNotification(
+      updatedPedido,
+      "order_status_update",
+      status
+    );
+
     res.status(200).json(updatedPedido);
   } catch (error) {
     res.status(500).json({ message: "Error updating order", error });
   }
 }
-
 /**
  * @swagger
  * /api/pedidos/{id}:
