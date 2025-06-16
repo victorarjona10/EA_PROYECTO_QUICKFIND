@@ -345,7 +345,6 @@ class UserService {
                 }
             }
             user.wallet -= total;
-            order.status = "Finalizada";
             yield order.save();
             return yield user.save();
         });

@@ -394,7 +394,6 @@ async PayOrder(userId: string, orderId: string): Promise<IUser | null> {
   }
 
   user.wallet -= total;
-  order.status = "Finalizada";
   await order.save();
   return await user.save();
 }

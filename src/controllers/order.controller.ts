@@ -206,7 +206,7 @@ export async function updateOrderStatus(
     }
 
     // AQUÍ ESTÁ EL PROBLEMA
-    // @ts-ignore
+    // ts-ignore
     //const ownerId = req.user.id; // ASEGÚRATE DE USAR .id, NO EL OBJETO COMPLETO
 
     // Si necesitas depurar
