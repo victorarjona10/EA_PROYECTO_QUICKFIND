@@ -52,6 +52,7 @@ class FeedbackService {
                 user_id: new mongoose_1.default.Types.ObjectId(userId),
             })
                 .sort({ created_at: -1 })
+                .populate("user_id", "name email")
                 .exec();
         });
     }

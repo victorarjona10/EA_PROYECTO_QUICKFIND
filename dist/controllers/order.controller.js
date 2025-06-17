@@ -32,7 +32,6 @@ function postPedido(req, res) {
                     .json({ message: "User ID, Product ID and quantity are required" });
             }
             const newPedido = yield pedidosService.postPedido(pedido);
-            console.log("Nuevo pedido creado:", newPedido);
             yield companyService.addPendingOrderToCompany(pedido.company_id.toString(), newPedido._id.toString());
             yield notification_service_1.notificationService.sendNotification(newPedido, "new_order");
             res.status(200).json(newPedido);

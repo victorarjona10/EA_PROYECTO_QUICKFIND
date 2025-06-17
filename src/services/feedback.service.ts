@@ -40,6 +40,7 @@ export class FeedbackService {
       user_id: new mongoose.Types.ObjectId(userId),
     })
       .sort({ created_at: -1 })
+      .populate("user_id", "name email")
       .exec();
   }
 
