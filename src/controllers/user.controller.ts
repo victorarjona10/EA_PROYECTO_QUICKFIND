@@ -4,10 +4,9 @@ import { UserService } from "../services/user.service";
 // para las funciones de addSubjectToUser
 import { RequestExt } from "../middleware/session";
 import { UserModel } from "../models/user";
-import { v4 as uuidv4 } from 'uuid';
-import { generateToken } from '../utils/jwt.handle';
+import { v4 as uuidv4 } from "uuid";
+import { generateToken } from "../utils/jwt.handle";
 import passport from "passport";
-
 
 const userService = new UserService();
 
@@ -35,33 +34,37 @@ const userService = new UserService();
  */
 
 export async function postUser(req: Request, res: Response): Promise<void> {
-    try {
-        const user = req.body as IUser;
+  try {
+    const user = req.body as IUser;
 
-        // Validar que los datos requeridos estén presentes
-        if (!user.email || !user.password) {
-            res.status(400).json({ message: "Email y contraseña son obligatorios" });
-            return;
-        }
-
-        const newUser = await userService.postUser(user);
-        res.status(201).json(newUser);
-        return;
-    } catch (error: any) {
-        if (error.code === 11000) {
-            // Error de duplicado en MongoDB
-            res.status(403).json({ message: "El email ya está registrado" });
-            return;
-        } else if (error.name === "ValidationError") {
-            // Error de validación de Mongoose
-            res.status(400).json({ message: "Datos inválidos", details: error.errors });
-            return;
-        } else {
-            // Error genérico
-            res.status(500).json({ message: "Error al crear el usuario", error: error.message });
-            return;
-        }
+    // Validar que los datos requeridos estén presentes
+    if (!user.email || !user.password) {
+      res.status(400).json({ message: "Email y contraseña son obligatorios" });
+      return;
     }
+
+    const newUser = await userService.postUser(user);
+    res.status(201).json(newUser);
+    return;
+  } catch (error: any) {
+    if (error.code === 11000) {
+      // Error de duplicado en MongoDB
+      res.status(403).json({ message: "El email ya está registrado" });
+      return;
+    } else if (error.name === "ValidationError") {
+      // Error de validación de Mongoose
+      res
+        .status(400)
+        .json({ message: "Datos inválidos", details: error.errors });
+      return;
+    } else {
+      // Error genérico
+      res
+        .status(500)
+        .json({ message: "Error al crear el usuario", error: error.message });
+      return;
+    }
+  }
 }
 
 /**
@@ -120,27 +123,32 @@ export async function getAllUsers(req: Request, res: Response): Promise<void> {
  *         description: Error getting user
  */
 export async function getUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-        // Validar que el ID sea válido
-        if (!id || id.length !== 24) {
-            res.status(400).json({ message: "ID inválido getUserById" });
-            return;
-        }
-
-        const user = await userService.getUserById(id);
-        if (!user) {
-            res.status(404).json({ message: "Usuario no encontrado" });
-            return;
-        }
-
-        res.status(200).json(user);
-        return;
-    } catch (error) {
-        res.status(500).json({ message: "Error al obtener el usuario", error: (error as any).message });
-        return;
+    // Validar que el ID sea válido
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido getUserById" });
+      return;
     }
+
+    const user = await userService.getUserById(id);
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
+
+    res.status(200).json(user);
+    return;
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Error al obtener el usuario",
+        error: (error as any).message,
+      });
+    return;
+  }
 }
 
 /**
@@ -251,40 +259,47 @@ export async function getUserByEmail(
  *       400:
  *         description: Error updating user
  */
-export async function updateUserById(req: Request, res: Response): Promise<void> {
-    try {
-        const id = req.params.id;
-        const user = req.body.user as Partial<IUser>;
+export async function updateUserById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id;
+    const user = req.body.user as Partial<IUser>;
 
-        // Validar que el ID sea válido
-        if (!id || id.length !== 24) {
-           res.status(400).json({ message: "ID inválido updateUserById" });
-           return;
-          }
-
-        // Validar que los datos requeridos estén presentes
-        if (!user.email) {
-           res.status(400).json({ message: "El email es obligatorio" });
-           return;
-          }
-
-
-        const updatedUser = await userService.updateUserById(id, user);
-        if (!updatedUser) {
-           res.status(404).json({ message: "Usuario no encontrado" });
-           return;
-          }
-
-        res.status(200).json(updatedUser);
-    } catch (error: any) {
-        if (error.code === 11000) {
-            res.status(403).json({ message: "El email ya está registrado" });
-             return;
-          } else {
-            res.status(500).json({ message: "Error al actualizar el usuario", error: error.message });
-            return;
-          }
+    // Validar que el ID sea válido
+    if (!id || id.length !== 24) {
+      res.status(400).json({ message: "ID inválido updateUserById" });
+      return;
     }
+
+    // Validar que los datos requeridos estén presentes
+    if (!user.email) {
+      res.status(400).json({ message: "El email es obligatorio" });
+      return;
+    }
+
+    const updatedUser = await userService.updateUserById(id, user);
+    if (!updatedUser) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error: any) {
+    if (error.code === 11000) {
+      res.status(403).json({ message: "El email ya está registrado" });
+      return;
+    } else {
+      res
+        .status(500)
+        .json({
+          message: "Error al actualizar el usuario",
+          error: error.message,
+        });
+      return;
+    }
+  }
 }
 
 /**
@@ -339,7 +354,6 @@ export async function ativateUserById(
     const activatedUser = await userService.ativateUserById(id);
     if (!activatedUser) {
       res.status(404).json({ message: "Usuario no encontrado" });
-
     }
     res.status(200).json(activatedUser);
   } catch (error) {
@@ -355,7 +369,6 @@ export async function getAllActiveUsers(
     const activeUsers = await userService.getAllActiveUsers();
     if (!activeUsers) {
       res.status(404).json({ message: "No hay usuarios activos" });
-
     }
     res.status(200).json(activeUsers);
   } catch (error) {
@@ -363,20 +376,22 @@ export async function getAllActiveUsers(
   }
 }
 
-export async function getUsersByFiltration(req: Request, res: Response): Promise<void> {
+export async function getUsersByFiltration(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
     const filters = req.query; // Obtener filtros desde los query parameters
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
 
-
     const users = await userService.getUsersByFiltration(filters, page, limit);
     res.status(200).json(users);
-} catch (error) {
-
-    res.status(500).json({ message: "Error getting users by filtration", error });
-}
-
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error getting users by filtration", error });
+  }
 }
 
 export async function loginUser(req: Request, res: Response): Promise<void> {
@@ -387,10 +402,12 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
   } catch (error: any) {
     res.status(401).json({ message: error.message });
   }
-
 }
 
-export async function refreshAccesToken(req: Request, res: Response): Promise<void> {
+export async function refreshAccesToken(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
     const { refreshToken } = req.body;
 
@@ -399,9 +416,12 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
       return;
     }
 
-    const { newAccessToken, newRefreshToken } = await userService.refreshTokenService(refreshToken);
+    const { newAccessToken, newRefreshToken } =
+      await userService.refreshTokenService(refreshToken);
 
-    res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
+    res
+      .status(200)
+      .json({ token: newAccessToken, refreshToken: newRefreshToken });
   } catch (error: any) {
     if (error.message === "Refresh Token inválido") {
       res.status(410).json({ message: "Refresh token inválido" });
@@ -417,8 +437,7 @@ export async function refreshAccesToken(req: Request, res: Response): Promise<vo
 export async function updateAvatar(req: Request, res: Response): Promise<void> {
   try {
     const { email, avatar } = req.body;
-    
-    
+
     const updatedAvatar = await userService.updateAvatar(avatar, email);
     res.status(200).json(updatedAvatar);
     return;
@@ -426,28 +445,29 @@ export async function updateAvatar(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: "Error refreshing access token", error });
     return;
   }
-  
 }
 
+export async function Google(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const origin = req.query.origin || "https://ea6.upc.edu"; // Obtén el origen desde los parámetros de la consulta o usa un valor por defecto
+  const state = JSON.stringify({ origin }); // Incluye el origen en el estado
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    session: false,
+    state, // Pasa el estado a Google
+  })(req, res, next);
+}
 
-
-export async function Google(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const origin = req.query.origin || 'http://localhost:3000';
-    const state = JSON.stringify({ origin }); // Incluye el origen en el estado
-    passport.authenticate('google', {
-      scope: ['profile', 'email'],
-      session: false,
-      state, // Pasa el estado a Google
-    })(req, res, next);
-  }
-
-
-
-
-export const googleCallback = async (req: Request, res: Response): Promise<void> => {
+export const googleCallback = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const state = JSON.parse((req.query.state as string) || '{}'); // Recupera el estado
-    const origin = state.origin || 'http://localhost:3000'; // Obtén el origen del estado
+    const state = JSON.parse((req.query.state as string) || "{}"); // Recupera el estado
+    const origin = state.origin || "https://ea6.upc.edu"; // Obtén el origen del estado
 
     const user = req.user as any;
 
@@ -470,7 +490,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
                 _id: '${user._id}',
                 name: '${user.name}',
                 email: '${user.email}',
-                avatar: '${user.avatar || ''}'
+                avatar: '${user.avatar || ""}'
               }
             }, '${origin}');
             window.close();
@@ -479,15 +499,15 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
       </html>
     `);
   } catch (error) {
-    console.error('Error en googleCallback:', error);
-    res.status(500).send('Error interno del servidor');
+    console.error("Error en googleCallback:", error);
+    res.status(500).send("Error interno del servidor");
   }
 };
 
-export async function addFollowed (req: Request, res: Response): Promise<void> {
+export async function addFollowed(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.params.id; 
-    const {companyId}  = req.body;
+    const userId = req.params.id;
+    const { companyId } = req.body;
     const updatedUser = await userService.FollowCompany(userId, companyId);
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -496,10 +516,13 @@ export async function addFollowed (req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function UnfollowCompany (req: Request, res: Response): Promise<void> {
+export async function UnfollowCompany(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
-    const userId = req.params.id; 
-    const {companyId}  = req.body;
+    const userId = req.params.id;
+    const { companyId } = req.body;
     const updatedUser = await userService.UnfollowCompany(userId, companyId);
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -509,42 +532,38 @@ export async function UnfollowCompany (req: Request, res: Response): Promise<voi
 }
 
 //funcion que usa user service para obtener las compañias que sigue un usuario
-export async function getFollowedCompanies (req: Request, res: Response): Promise<void> {
+export async function getFollowedCompanies(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const followedCompanies = await userService.getFollowedCompanies(userId);
     res.status(200).json(followedCompanies);
   } catch (error) {
     console.error("Error in getFollowedCompanies:", error);
-    res.status(500).json({ message: "Error getting followed companies", error });
+    res
+      .status(500)
+      .json({ message: "Error getting followed companies", error });
   }
 }
 
-
-
-
-
-
-
-
-
-export async function FollowUser (req: Request, res: Response): Promise<void> {
+export async function FollowUser(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.params.id; 
-    const {currentUserId}  = req.body;
+    const userId = req.params.id;
+    const { currentUserId } = req.body;
     const updatedUser = await userService.FollowUser(currentUserId, userId);
     res.status(200).json(updatedUser);
-    
   } catch (error) {
     console.error("Error in FollowUser:", error);
     res.status(500).json({ message: "Error following user", error });
   }
 }
 
-export async function UnfollowUser (req: Request, res: Response): Promise<void> {
+export async function UnfollowUser(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.params.id; 
-    const {currentUserId}  = req.body;
+    const userId = req.params.id;
+    const { currentUserId } = req.body;
     const updatedUser = await userService.UnfollowUser(currentUserId, userId);
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -553,21 +572,26 @@ export async function UnfollowUser (req: Request, res: Response): Promise<void> 
   }
 }
 
-export async function getFollowedUsers (req: Request, res: Response): Promise<void> {
+export async function getFollowedUsers(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const followedUsers = await userService.getFollowedUsers(userId);
     res.status(200).json(followedUsers);
+  } catch (error) {
+    console.error("Error in getFollowedUsers:", error);
+    res.status(500).json({ message: "Error getting followed users", error });
   }
-  catch (error) {
-      console.error("Error in getFollowedUsers:", error);
-      res.status(500).json({ message: "Error getting followed users", error });
-    }
 }
 
-export async function getFollowingUsers (req: Request, res: Response): Promise<void> {
+export async function getFollowingUsers(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const followingUsers = await userService.getFollowingUsers(userId);
     res.status(200).json(followingUsers);
   } catch (error) {
@@ -577,23 +601,28 @@ export async function getFollowingUsers (req: Request, res: Response): Promise<v
 }
 
 //funcion obtener todas las compañias de un usuario
-export async function getAllCompanies (req: Request, res: Response): Promise<void> {
+export async function getAllCompanies(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const allCompanies = await userService.getCompaniesByOwnerId(userId);
     res.status(200).json(allCompanies);
   } catch (error) {
     console.error("Error in getFollowedCompanies:", error);
-    res.status(500).json({ message: "Error getting followed companies", error });
+    res
+      .status(500)
+      .json({ message: "Error getting followed companies", error });
   }
 }
 
-export async function addMoney (req: Request, res: Response): Promise<void> {
+export async function addMoney(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const { amount } = req.body;
 
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
+    if (!amount || typeof amount !== "number" || amount <= 0) {
       res.status(400).json({ message: "Cantidad inválida" });
       return;
     }
@@ -606,9 +635,9 @@ export async function addMoney (req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function PayOrder (req: Request, res: Response): Promise<void> {
+export async function PayOrder(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     const { orderId } = req.body;
 
     if (!orderId) {

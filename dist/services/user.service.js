@@ -100,7 +100,10 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             const skip = (page - 1) * limit;
             const filter = Object.fromEntries(Object.entries(user).filter(([_, value]) => value != null));
-            const regexFilter = Object.fromEntries(Object.entries(filter).map(([key, value]) => [key, { $regex: new RegExp(value, "i") }]));
+            const regexFilter = Object.fromEntries(Object.entries(filter).map(([key, value]) => [
+                key,
+                { $regex: new RegExp(value, "i") },
+            ]));
             return yield user_1.UserModel.find(regexFilter).skip(skip).limit(limit);
         });
     }
@@ -185,11 +188,15 @@ class UserService {
             if (alreadyFollowed) {
                 throw new Error("Ya sigues esta empresa");
             }
-            user.company_Followed.push({ company_id: new mongoose_1.default.Types.ObjectId(companyId) });
+            user.company_Followed.push({
+                company_id: new mongoose_1.default.Types.ObjectId(companyId),
+            });
             const company = yield company_1.CompanyModel.findById(companyId);
             if (company) {
                 company.followers++;
-                company.user_Followers.push({ user_id: new mongoose_1.default.Types.ObjectId(userId) });
+                company.user_Followers.push({
+                    user_id: new mongoose_1.default.Types.ObjectId(userId),
+                });
                 yield company.save();
             }
             return yield user.save();
@@ -238,7 +245,9 @@ class UserService {
             if (alreadyFollowed) {
                 throw new Error("Ya sigues a este usuario");
             }
-            user.user_Followed.push({ user_id: new mongoose_1.default.Types.ObjectId(userToFollowId) });
+            user.user_Followed.push({
+                user_id: new mongoose_1.default.Types.ObjectId(userToFollowId),
+            });
             user.following++;
             const followedUser = yield user_1.UserModel.findById(userToFollowId);
             if (followedUser) {
@@ -284,7 +293,9 @@ class UserService {
     }
     getFollowingUsers(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const followers = yield user_1.UserModel.find({ "user_Followed.user_id": userId }).populate("user_Followed.user_id");
+            const followers = yield user_1.UserModel.find({
+                "user_Followed.user_id": userId,
+            }).populate("user_Followed.user_id");
             return followers;
         });
     }
@@ -345,7 +356,6 @@ class UserService {
                 }
             }
             user.wallet -= total;
-            order.status = "Finalizada";
             yield order.save();
             return yield user.save();
         });

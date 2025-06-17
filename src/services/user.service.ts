@@ -2,7 +2,7 @@ import { IUser, UserModel } from "../models/user";
 import mongoose from "mongoose";
 import { verified } from "../utils/bcrypt.handle";
 import { generateToken } from "../utils/jwt.handle";
-import {encrypt} from "../utils/bcrypt.handle";
+import { encrypt } from "../utils/bcrypt.handle";
 import { v4 as uuidv4 } from "uuid";
 import { ICompany, CompanyModel } from "../models/company";
 import { OrderModel } from "../models/order";
@@ -10,9 +10,7 @@ import { ProductModel } from "../models/product";
 
 import { Profile } from "passport-google-oauth20";
 
-
 export class UserService {
-
   async getAllUsers(page: number, limit: number): Promise<IUser[]> {
     const skip = (page - 1) * limit;
     return await UserModel.find().skip(skip).limit(limit);
@@ -33,84 +31,91 @@ export class UserService {
   async getAllActiveUsers(): Promise<IUser[]> {
     return await UserModel.find({ Flag: true });
   }
-    async postUser(user: Partial<IUser>): Promise<IUser> {
-        try {
-            if (!user.password) {
-                throw new Error("Password is required");
-            }
-        user.password = await encrypt(user.password); // Asegúrate de que user.password no sea undefined
-        const newUser = new UserModel(user);
-        return await newUser.save();
+  async postUser(user: Partial<IUser>): Promise<IUser> {
+    try {
+      if (!user.password) {
+        throw new Error("Password is required");
+      }
+      user.password = await encrypt(user.password); // Asegúrate de que user.password no sea undefined
+      const newUser = new UserModel(user);
+      return await newUser.save();
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new Error("El email ya está registrado");
+      }
+      throw error;
+    }
+  }
+
+  async getUserByName(name: string): Promise<IUser | null> {
+    return await UserModel.findOne({ name });
+  }
+
+  async getUserById(id: string): Promise<IUser | null> {
+    return await UserModel.findById(id);
+  }
+
+  async getUserByEmail(email: string): Promise<IUser | null> {
+    return await UserModel.findOne({ email });
+  }
+
+  async updateUserById(
+    id: string,
+    user: Partial<IUser>
+  ): Promise<IUser | null> {
+    try {
+      if (user.email) {
+        // Buscar si ya existe un usuario con este email
+        const existingUser = await UserModel.findOne({ email: user.email });
+
+        // Si se encuentra un usuario con el mismo email y su ID no coincide
+        if (existingUser && existingUser._id.toString() !== id) {
+          throw new Error("El email ya está registrado");
         }
-        catch (error: any) {
-            if (error.code === 11000) {
-                throw new Error("El email ya está registrado");
-            }
-            throw error;
-        }
+      }
+      return await UserModel.findByIdAndUpdate(id, user, { new: true });
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new Error("El email ya está registrado");
+      }
+      throw error;
     }
+  }
 
-    async getUserByName(name: string): Promise<IUser | null> {
-        return await UserModel.findOne({ name });
-    }
+  async getUsersByFiltration(
+    user: Partial<IUser>,
+    page: number,
+    limit: number
+  ): Promise<IUser[]> {
+    const skip = (page - 1) * limit;
 
-    async getUserById(id: string): Promise<IUser | null>{
-        return await UserModel.findById(id);
-    }
+    // Eliminar campos nulos o indefinidos del objeto users
+    const filter: Partial<IUser> = Object.fromEntries(
+      Object.entries(user).filter(([_, value]) => value != null)
+    );
 
-    async getUserByEmail(email: string): Promise<IUser | null> {
-        return await UserModel.findOne({ email });
-    }
+    // Convertir los valores de los campos en expresiones regulares para búsqueda parcial
+    const regexFilter: Partial<IUser> = Object.fromEntries(
+      Object.entries(filter).map(([key, value]) => [
+        key,
+        { $regex: new RegExp(value as string, "i") },
+      ])
+    );
 
-    async updateUserById(id: string, user: Partial<IUser>): Promise<IUser | null> {
-        try{
-            if (user.email) {
-                // Buscar si ya existe un usuario con este email
-                const existingUser = await UserModel.findOne({ email: user.email });
-    
-                // Si se encuentra un usuario con el mismo email y su ID no coincide
-                if (existingUser && existingUser._id.toString() !== id) {
-                    throw new Error("El email ya está registrado");
-                }
-            }           
-            return await UserModel.findByIdAndUpdate(id, user, {new: true});
-        }
-        catch (error: any) {
-            if (error.code === 11000) {
-                throw new Error("El email ya está registrado");
-            }
-            throw error;
-        }
-    }
+    return await UserModel.find(regexFilter).skip(skip).limit(limit);
+  }
 
-    
-    
-    async getUsersByFiltration(user : Partial<IUser>, page: number, limit: number): Promise<IUser[]> {
-        const skip = (page - 1) * limit;
-        
-        // Eliminar campos nulos o indefinidos del objeto users
-        const filter: Partial<IUser> = Object.fromEntries(
-        Object.entries(user).filter(([_, value]) => value != null)
-        );
-
-        // Convertir los valores de los campos en expresiones regulares para búsqueda parcial
-        const regexFilter: Partial<IUser> = Object.fromEntries(
-        Object.entries(filter).map(([key, value]) => [key, { $regex: new RegExp(value as string, "i") }])
-        );
-
-
-        return await UserModel.find(regexFilter).skip(skip).limit(limit);
-    }
-
-
-  async loginUser(email: string, password: string): Promise<{ token: string; user: IUser, refreshToken: string }> {
+  async loginUser(
+    email: string,
+    password: string
+  ): Promise<{ token: string; user: IUser; refreshToken: string }> {
     const user = await UserModel.findOne({ email });
     if (!user) {
       throw new Error("Email o contraseña incorrectos");
     }
 
     // Comparación directa de contraseñas
-    const isPasswordValid = await verified(password, user.password); 
+    const isPasswordValid = await verified(password, user.password);
     if (!isPasswordValid) {
       throw new Error("Email o contraseña incorrectos");
     }
@@ -119,7 +124,7 @@ export class UserService {
     const refreshToken = uuidv4(); // Genera un nuevo refresh token
     const refreshTokenExpiry = new Date(); // Fecha de expiración
     refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 7); // Expira en 7 días
-    
+
     user.refreshToken = refreshToken; // Almacena el refresh token en el usuario
     user.refreshTokenExpiry = refreshTokenExpiry; // Almacena la fecha de expiración del refresh token
     await user.save(); // Guarda los cambios en la base de datos
@@ -128,39 +133,41 @@ export class UserService {
     //return { token, refreshToken };
   }
 
-
-  async refreshTokenService(refreshToken: string): Promise<{ newAccessToken: string, newRefreshToken: string }> {
+  async refreshTokenService(
+    refreshToken: string
+  ): Promise<{ newAccessToken: string; newRefreshToken: string }> {
     const user = await UserModel.findOne({ refreshToken });
     if (!user) {
       console.error("Refresh Token no encontrado en la base de datos.");
       throw new Error("Refresh Token inválido");
     }
-  
+
     // Verificar si el Refresh Token ha caducado
     if (user.refreshTokenExpiry && new Date() > user.refreshTokenExpiry) {
       console.error("Refresh Token caducado.");
       throw new Error("Refresh Token caducado");
     }
-  
 
-  
     // Generar un nuevo Access Token y Refresh Token
     const newAccessToken = generateToken(user.id, user.email);
     const newRefreshToken = uuidv4();
     const newRefreshTokenExpiry = new Date();
     newRefreshTokenExpiry.setDate(newRefreshTokenExpiry.getDate() + 7); // Expira en 7 días
-  
+
     // Actualizar el Refresh Token en la base de datos
     user.refreshToken = newRefreshToken;
     user.refreshTokenExpiry = newRefreshTokenExpiry;
     await user.save();
-  
-  
+
     return { newAccessToken, newRefreshToken };
   }
 
-  async updateAvatar( avatar:string, email: string): Promise<IUser | null>{
-    return await UserModel.findOneAndUpdate({email:email}, { avatar: avatar }, { new: true });
+  async updateAvatar(avatar: string, email: string): Promise<IUser | null> {
+    return await UserModel.findOneAndUpdate(
+      { email: email },
+      { avatar: avatar },
+      { new: true }
+    );
   }
   // ============== Google 登录专用方法 ==============
   async findOrCreateUserFromGoogle(profile: Profile): Promise<IUser> {
@@ -181,19 +188,19 @@ export class UserService {
       password: await encrypt(uuidv4()), // Genera una contraseña aleatoria
       avatar: profile.photos?.[0]?.value || "",
       Flag: true,
-      googleId: profile.id, 
-      phone: 0, 
+      googleId: profile.id,
+      phone: 0,
       wallet: 0,
       description: "",
-
     });
-
-
 
     return await newUser.save();
   }
 
-  async FollowCompany(userId: string, companyId: string): Promise<IUser | null> {
+  async FollowCompany(
+    userId: string,
+    companyId: string
+  ): Promise<IUser | null> {
     const user = await UserModel.findById(userId);
     if (!user) {
       throw new Error("Usuario no encontrado");
@@ -205,23 +212,27 @@ export class UserService {
     if (alreadyFollowed) {
       throw new Error("Ya sigues esta empresa");
     }
-    
-      
-    user.company_Followed.push({ company_id: new mongoose.Types.ObjectId(companyId) });
+
+    user.company_Followed.push({
+      company_id: new mongoose.Types.ObjectId(companyId),
+    });
 
     const company = await CompanyModel.findById(companyId);
     if (company) {
       company.followers++;
-      
 
-      company.user_Followers.push({user_id: new mongoose.Types.ObjectId(userId) })
+      company.user_Followers.push({
+        user_id: new mongoose.Types.ObjectId(userId),
+      });
       await company.save();
     }
     return await user.save();
-    
   }
 
-  async UnfollowCompany(userId: string, companyId: string): Promise<IUser | null> {
+  async UnfollowCompany(
+    userId: string,
+    companyId: string
+  ): Promise<IUser | null> {
     const user = await UserModel.findById(userId);
     if (!user) {
       throw new Error("Usuario no encontrado");
@@ -244,160 +255,158 @@ export class UserService {
     return await user.save();
   }
   //funcion para obtener la lista de empresas seguidas por el usuario
-  async  getFollowedCompanies(userId: string): Promise<ICompany[]> {
-    const user = await UserModel.findById(userId).populate("company_Followed.company_id");
+  async getFollowedCompanies(userId: string): Promise<ICompany[]> {
+    const user = await UserModel.findById(userId).populate(
+      "company_Followed.company_id"
+    );
     if (!user) {
       throw new Error("Usuario no encontrado");
     }
     return user.company_Followed.map((company) => {
-        if (company.company_id instanceof mongoose.Types.ObjectId) {
-            throw new Error("Company data is not populated");
-        }
-        return company.company_id as ICompany;
+      if (company.company_id instanceof mongoose.Types.ObjectId) {
+        throw new Error("Company data is not populated");
+      }
+      return company.company_id as ICompany;
     });
-}
-
-
-
-
-
-
-
-
-//------------------------------Funciones de seguimiento de usuarios------------------------------
-
-
-
-async FollowUser(userId: string, userToFollowId: string): Promise<IUser | null> {
-  const user = await UserModel.findById(userId);
-  if (!user) { 
-    throw new Error("Usuario no encontrado");
   }
-  const alreadyFollowed = user.user_Followed.some(
-    (followedUser) => followedUser.user_id.toString() === userToFollowId
-  );
-  if (alreadyFollowed) {
-    throw new Error("Ya sigues a este usuario");
-  }
-  user.user_Followed.push({ user_id: new mongoose.Types.ObjectId(userToFollowId) });
-  user.following++;
-  const followedUser = await UserModel.findById(userToFollowId);
-  if (followedUser) {
-    followedUser.followers++;
-    await followedUser.save();
-  }
-  return await user.save();
-}
 
-async UnfollowUser(userId: string, userToUnfollowId: string): Promise<IUser | null> {
-  const user = await UserModel.findById(userId);
-  if (!user) {
-    throw new Error("Usuario no encontrado");
-  }
-  const userIndex = user.user_Followed.findIndex(
-    (followedUser) => followedUser.user_id.toString() === userToUnfollowId
-  );
-  if (userIndex === -1) {
-    throw new Error("No sigues a este usuario");
-  }
-  user.user_Followed.splice(userIndex, 1);
-  user.following--;
-  const unfollowedUser = await UserModel.findById(userToUnfollowId);
-  if (unfollowedUser) {
-    unfollowedUser.followers--;
-    await unfollowedUser.save();
-  }
-  return await user.save();
-}
+  //------------------------------Funciones de seguimiento de usuarios------------------------------
 
-async getFollowedUsers(userId: string): Promise<IUser[]> {
-  const user = await UserModel.findById(userId).populate("user_Followed.user_id");
-  if (!user) {
-    throw new Error("Usuario no encontrado");
-  }
-  return user.user_Followed.map((followedUser) => {
-    if (followedUser.user_id instanceof mongoose.Types.ObjectId) {
-      throw new Error("User data is not populated");
-    }
-    return followedUser.user_id as IUser;
-  });
-}
-
-
-async getFollowingUsers(userId: string): Promise<IUser[]> {
-
-    // Busca todos los usuarios que tienen tu userId en su array user_Followed
-    const followers = await UserModel.find({ "user_Followed.user_id": userId }).populate("user_Followed.user_id");
-    return followers;
-  
-}
-
-//-------------------------------Fin de funciones de seguimiento de usuarios------------------------------
-
-
-async getCompaniesByOwnerId(userId: string): Promise<ICompany[]> {
-  try {
-    // Buscar todas las compañías cuyo ownerId coincida con el userId proporcionado
-    const companies = await CompanyModel.find({ ownerId: userId });
-    if (companies.length === 0) {
-      throw new Error("No se encontraron compañías para este usuario");
-    }
-    return companies;
-  } catch (error) {
-    console.error("Error al obtener las compañías del usuario:", error);
-    throw error;
-  }
-}
-
-async addMoney(userId: string, money: number): Promise<IUser | null> {
+  async FollowUser(
+    userId: string,
+    userToFollowId: string
+  ): Promise<IUser | null> {
     const user = await UserModel.findById(userId);
     if (!user) {
-        throw new Error("Usuario no encontrado");
+      throw new Error("Usuario no encontrado");
+    }
+    const alreadyFollowed = user.user_Followed.some(
+      (followedUser) => followedUser.user_id.toString() === userToFollowId
+    );
+    if (alreadyFollowed) {
+      throw new Error("Ya sigues a este usuario");
+    }
+    user.user_Followed.push({
+      user_id: new mongoose.Types.ObjectId(userToFollowId),
+    });
+    user.following++;
+    const followedUser = await UserModel.findById(userToFollowId);
+    if (followedUser) {
+      followedUser.followers++;
+      await followedUser.save();
+    }
+    return await user.save();
+  }
+
+  async UnfollowUser(
+    userId: string,
+    userToUnfollowId: string
+  ): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    const userIndex = user.user_Followed.findIndex(
+      (followedUser) => followedUser.user_id.toString() === userToUnfollowId
+    );
+    if (userIndex === -1) {
+      throw new Error("No sigues a este usuario");
+    }
+    user.user_Followed.splice(userIndex, 1);
+    user.following--;
+    const unfollowedUser = await UserModel.findById(userToUnfollowId);
+    if (unfollowedUser) {
+      unfollowedUser.followers--;
+      await unfollowedUser.save();
+    }
+    return await user.save();
+  }
+
+  async getFollowedUsers(userId: string): Promise<IUser[]> {
+    const user = await UserModel.findById(userId).populate(
+      "user_Followed.user_id"
+    );
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    return user.user_Followed.map((followedUser) => {
+      if (followedUser.user_id instanceof mongoose.Types.ObjectId) {
+        throw new Error("User data is not populated");
+      }
+      return followedUser.user_id as IUser;
+    });
+  }
+
+  async getFollowingUsers(userId: string): Promise<IUser[]> {
+    // Busca todos los usuarios que tienen tu userId en su array user_Followed
+    const followers = await UserModel.find({
+      "user_Followed.user_id": userId,
+    }).populate("user_Followed.user_id");
+    return followers;
+  }
+
+  //-------------------------------Fin de funciones de seguimiento de usuarios------------------------------
+
+  async getCompaniesByOwnerId(userId: string): Promise<ICompany[]> {
+    try {
+      // Buscar todas las compañías cuyo ownerId coincida con el userId proporcionado
+      const companies = await CompanyModel.find({ ownerId: userId });
+      if (companies.length === 0) {
+        throw new Error("No se encontraron compañías para este usuario");
+      }
+      return companies;
+    } catch (error) {
+      console.error("Error al obtener las compañías del usuario:", error);
+      throw error;
+    }
+  }
+
+  async addMoney(userId: string, money: number): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
     }
     if (money <= 0) {
-        throw new Error("La cantidad a añadir debe ser mayor que cero");
+      throw new Error("La cantidad a añadir debe ser mayor que cero");
     }
 
     user.wallet += money;
     return await user.save();
   }
 
-async PayOrder(userId: string, orderId: string): Promise<IUser | null> {
-  const user = await UserModel.findById(userId);
-  if (!user) {
-    throw new Error("Usuario no encontrado");
-  }
-  const order = await OrderModel.findById(orderId);
-  if (!order) {
-    throw new Error("Pedido no encontrado");
-  }
-
-  let total = 0;
-  for (const item of order.products) {
-    const product = await ProductModel.findById(item.product_id);
-    if (!product) {
-      throw new Error(`Producto con id ${item.product_id} no encontrado`);
+  async PayOrder(userId: string, orderId: string): Promise<IUser | null> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
     }
-    total += product.price * item.quantity;
-  }
-
-  if (user.wallet < total) {
-    throw new Error("Saldo insuficiente en la billetera del usuario");
-  }
-
-  for (const item of order.products) {
-    const product = await ProductModel.findById(item.product_id);
-    if (product && product.stock !== undefined) {
-      product.stock -= item.quantity;
-      await product.save();
+    const order = await OrderModel.findById(orderId);
+    if (!order) {
+      throw new Error("Pedido no encontrado");
     }
+
+    let total = 0;
+    for (const item of order.products) {
+      const product = await ProductModel.findById(item.product_id);
+      if (!product) {
+        throw new Error(`Producto con id ${item.product_id} no encontrado`);
+      }
+      total += product.price * item.quantity;
+    }
+
+    if (user.wallet < total) {
+      throw new Error("Saldo insuficiente en la billetera del usuario");
+    }
+
+    for (const item of order.products) {
+      const product = await ProductModel.findById(item.product_id);
+      if (product && product.stock !== undefined) {
+        product.stock -= item.quantity;
+        await product.save();
+      }
+    }
+
+    user.wallet -= total;
+    await order.save();
+    return await user.save();
   }
-
-  user.wallet -= total;
-  order.status = "Finalizada";
-  await order.save();
-  return await user.save();
 }
-
-}
-

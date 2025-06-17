@@ -61,11 +61,15 @@ function postUser(req, res) {
                 return;
             }
             else if (error.name === "ValidationError") {
-                res.status(400).json({ message: "Datos inválidos", details: error.errors });
+                res
+                    .status(400)
+                    .json({ message: "Datos inválidos", details: error.errors });
                 return;
             }
             else {
-                res.status(500).json({ message: "Error al crear el usuario", error: error.message });
+                res
+                    .status(500)
+                    .json({ message: "Error al crear el usuario", error: error.message });
                 return;
             }
         }
@@ -103,7 +107,12 @@ function getUserById(req, res) {
             return;
         }
         catch (error) {
-            res.status(500).json({ message: "Error al obtener el usuario", error: error.message });
+            res
+                .status(500)
+                .json({
+                message: "Error al obtener el usuario",
+                error: error.message,
+            });
             return;
         }
     });
@@ -164,7 +173,12 @@ function updateUserById(req, res) {
                 return;
             }
             else {
-                res.status(500).json({ message: "Error al actualizar el usuario", error: error.message });
+                res
+                    .status(500)
+                    .json({
+                    message: "Error al actualizar el usuario",
+                    error: error.message,
+                });
                 return;
             }
         }
@@ -227,7 +241,9 @@ function getUsersByFiltration(req, res) {
             res.status(200).json(users);
         }
         catch (error) {
-            res.status(500).json({ message: "Error getting users by filtration", error });
+            res
+                .status(500)
+                .json({ message: "Error getting users by filtration", error });
         }
     });
 }
@@ -252,7 +268,9 @@ function refreshAccesToken(req, res) {
                 return;
             }
             const { newAccessToken, newRefreshToken } = yield userService.refreshTokenService(refreshToken);
-            res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
+            res
+                .status(200)
+                .json({ token: newAccessToken, refreshToken: newRefreshToken });
         }
         catch (error) {
             if (error.message === "Refresh Token inválido") {
@@ -284,10 +302,10 @@ function updateAvatar(req, res) {
 }
 function Google(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const origin = req.query.origin || 'http://localhost:3000';
+        const origin = req.query.origin || "https://ea6.upc.edu";
         const state = JSON.stringify({ origin });
-        passport_1.default.authenticate('google', {
-            scope: ['profile', 'email'],
+        passport_1.default.authenticate("google", {
+            scope: ["profile", "email"],
             session: false,
             state,
         })(req, res, next);
@@ -295,8 +313,8 @@ function Google(req, res, next) {
 }
 const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const state = JSON.parse(req.query.state || '{}');
-        const origin = state.origin || 'http://localhost:3000';
+        const state = JSON.parse(req.query.state || "{}");
+        const origin = state.origin || "https://ea6.upc.edu";
         const user = req.user;
         const token = (0, jwt_handle_1.generateToken)(user._id.toString(), user.email);
         const refreshToken = (0, uuid_1.v4)();
@@ -312,7 +330,7 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 _id: '${user._id}',
                 name: '${user.name}',
                 email: '${user.email}',
-                avatar: '${user.avatar || ''}'
+                avatar: '${user.avatar || ""}'
               }
             }, '${origin}');
             window.close();
@@ -322,8 +340,8 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
     `);
     }
     catch (error) {
-        console.error('Error en googleCallback:', error);
-        res.status(500).send('Error interno del servidor');
+        console.error("Error en googleCallback:", error);
+        res.status(500).send("Error interno del servidor");
     }
 });
 exports.googleCallback = googleCallback;
@@ -364,7 +382,9 @@ function getFollowedCompanies(req, res) {
         }
         catch (error) {
             console.error("Error in getFollowedCompanies:", error);
-            res.status(500).json({ message: "Error getting followed companies", error });
+            res
+                .status(500)
+                .json({ message: "Error getting followed companies", error });
         }
     });
 }
@@ -431,7 +451,9 @@ function getAllCompanies(req, res) {
         }
         catch (error) {
             console.error("Error in getFollowedCompanies:", error);
-            res.status(500).json({ message: "Error getting followed companies", error });
+            res
+                .status(500)
+                .json({ message: "Error getting followed companies", error });
         }
     });
 }
@@ -440,7 +462,7 @@ function addMoney(req, res) {
         try {
             const userId = req.params.id;
             const { amount } = req.body;
-            if (!amount || typeof amount !== 'number' || amount <= 0) {
+            if (!amount || typeof amount !== "number" || amount <= 0) {
                 res.status(400).json({ message: "Cantidad inválida" });
                 return;
             }
