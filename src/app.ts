@@ -73,8 +73,8 @@ passport.use(
     }
   )
 );
-
-// 序列化用户（用于 session）
+// comentario 
+// 序列化用户（用于 session）//
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
